@@ -1,36 +1,108 @@
-/* stylelint-disable max-line-length */
+/* Genentech Font Family */
+
+/* Gene Sans - Primary body font */
 @font-face {
-  font-family: roboto-condensed;
+  font-family: gene-sans;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 300;
   font-display: swap;
-  src: url('../fonts/roboto-condensed-bold.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('../fonts/genentech/Gene-Sans-Light.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('../fonts/roboto-bold.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('../fonts/roboto-medium.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: roboto;
+  font-family: gene-sans;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/roboto-regular.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url('../fonts/genentech/Gene-Sans-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-sans;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Sans-Regular-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-sans;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Sans-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-sans;
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Sans-Bold-Italic.woff2') format('woff2');
+}
+
+/* Gene Serif - Hero headings, category labels */
+@font-face {
+  font-family: gene-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Serif-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Serif-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-serif;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Serif-Regular-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Serif-Bold.woff2') format('woff2');
+}
+
+/* Gene Condensed - Display headings */
+@font-face {
+  font-family: gene-condensed;
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Condensed-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-condensed;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Condensed-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-condensed;
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Condensed-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: gene-condensed;
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/genentech/Gene-Condensed-Heavy.woff2') format('woff2');
 }
