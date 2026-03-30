@@ -69,11 +69,15 @@ footer .footer-nav li a:hover {
 
 /* Social links */
 footer .footer-social {
+  padding: var(--spacing-s) 0;
+  border-top: 1px solid rgb(0 0 0 / 10%);
+}
+
+footer .footer-social p {
   display: flex;
   justify-content: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-s) 0;
-  border-top: 1px solid rgb(0 0 0 / 10%);
+  margin: 0;
 }
 
 footer .footer-social a {
