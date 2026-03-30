@@ -1,0 +1,77 @@
+/* Featured Article block — story takeover layout */
+
+.featured-article > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+}
+
+/* Text side */
+.featured-article .featured-article-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.featured-article .featured-article-text h2 {
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xl);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+  color: var(--text-color);
+  margin: 0;
+}
+
+.featured-article .featured-article-text p {
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-m);
+  font-weight: 400;
+  line-height: 1.81;
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* CTA button — primary navy pill */
+.featured-article .featured-article-text .button-wrapper {
+  margin: 0;
+}
+
+.featured-article .featured-article-text a.button {
+  background-color: var(--color-navy);
+  color: var(--color-white);
+  padding: var(--button-padding-small);
+  margin: 8px 0;
+}
+
+.featured-article .featured-article-text a.button:hover {
+  background-color: var(--color-link);
+}
+
+/* Image side */
+.featured-article .featured-article-image {
+  line-height: 0;
+}
+
+.featured-article .featured-article-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Desktop: side-by-side */
+@media (width >= 900px) {
+  .featured-article > div {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-xl);
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 var(--section-padding-inline);
+  }
+
+  .featured-article .featured-article-text,
+  .featured-article .featured-article-image {
+    flex: 1;
+    min-width: 0;
+  }
+}
