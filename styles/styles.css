@@ -21,8 +21,13 @@
   --overlay-background-color:lightgrey;
 
   /* fonts */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  --body-font-family: Gene-Sans-Regular, sans-serif;
+  --heading-font-family: Gene-Sans-Bold, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.8125;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -87,6 +92,8 @@ body {
   font-family: var(--body-font-family);
   font-size: var(--body-font-size-m);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  font-family: Gene-Sans-Bold, sans-serif;
 }
 
 body.appear {
@@ -95,6 +102,7 @@ body.appear {
 
 header {
   height: var(--header-height);
+  background-color: rgb(235, 230, 224);
 }
 
 header .header,
@@ -122,7 +130,7 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.25;
   scroll-margin: 40px;
 }
