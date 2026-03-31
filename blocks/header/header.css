@@ -181,7 +181,7 @@ header nav .nav-tools .button {
 @media (width >= 768px) {
   :root {
     --header-height: 101px;
-    --header-padding: 25px;
+    --header-padding: 28px;
     --header-btn-height: 51px;
     --header-btn-padding: 12px 13px;
     --header-btn-radius: 6px;
@@ -189,9 +189,27 @@ header nav .nav-tools .button {
     --header-hamburger-bar-gap: 6px;
   }
 
+  header nav[aria-expanded='true'] .nav-sections {
+    margin-top: 0;
+  }
+
   /* expanded overlay: grey background, close button top-right */
   header nav[aria-expanded='true'] {
-    background-color: #edf0f1;
+    background-color: #e9e7e2;
+  }
+
+  header nav[aria-expanded='true'] .nav-sections ul {
+    margin-top: 8px;
+  }
+
+  header nav[aria-expanded='true'] .nav-sections ul > li {
+    font-size: 1.125rem;
+    white-space: nowrap;
+    line-height: 24px;
+    font-family: Gene-Sans-Regular, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #30373d;
+    padding: 8px 0;
   }
 
   header nav[aria-expanded='true'] .nav-hamburger {
@@ -230,6 +248,31 @@ header nav .nav-tools .button {
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3 ~ * {
     display: none;
   }
+
+  header nav h6 {
+    color:gray;
+    font-size: .875rem;
+    font-family: Gene-Sans-Bold, sans-serif;
+    letter-spacing: .03rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.8125;
+    -webkit-text-size-adjust: 100%;
+    margin-top:8px;
+    margin-bottom:0;
+    font-weight: 450;
+  }
+
+  header nav a {
+    font-weight: 400;
+    line-height: 24px;
+    font-size:17px;
+    letter-spacing:0.28px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
 }
 
 /* ── 1024px+ : larger floating buttons ── */
