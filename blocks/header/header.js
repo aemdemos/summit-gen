@@ -3,6 +3,7 @@ import { loadFragment } from '../fragment/fragment.js';
 
 // gene.com uses hamburger at all sizes; this query is kept for escape/focus behavior
 const isDesktop = window.matchMedia('(min-width: 900px)');
+const isLargeDesktop = window.matchMedia('(min-width: 1200px)');
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -23,6 +24,17 @@ function closeOnFocusLost(e) {
     // eslint-disable-next-line no-use-before-define
     toggleMenu(nav, navSections, false);
   }
+}
+
+function closeOnClickOutside(e) {
+  const nav = document.getElementById('nav');
+  if (!nav || nav.getAttribute('aria-expanded') !== 'true') return;
+  // ignore clicks inside nav or on the search button
+  if (nav.contains(e.target) || e.target.closest('.nav-tools')) return;
+  const navSections = nav.querySelector('.nav-sections');
+  if (!navSections) return;
+  // eslint-disable-next-line no-use-before-define
+  toggleMenu(nav, navSections, false);
 }
 
 function openOnKeydown(e) {
@@ -61,7 +73,8 @@ function toggleAllNavSections(sections, expanded = false) {
 function toggleMenu(nav, navSections, forceExpanded = null) {
   const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
   const button = nav.querySelector('.nav-hamburger button');
-  document.body.style.overflowY = expanded ? '' : 'hidden';
+  // at 1024+ the nav is a card panel; don't lock body scroll
+  document.body.style.overflowY = (expanded || isLargeDesktop.matches) ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
   toggleAllNavSections(navSections, expanded ? 'false' : 'true');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
@@ -92,6 +105,14 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   } else {
     window.removeEventListener('keydown', closeOnEscape);
     nav.removeEventListener('focusout', closeOnFocusLost);
+  }
+
+  // at 1024+, close menu on click outside the nav card
+  if (!expanded && isLargeDesktop.matches) {
+    // slight delay so the opening click doesn't immediately close
+    setTimeout(() => document.addEventListener('click', closeOnClickOutside), 0);
+  } else {
+    document.removeEventListener('click', closeOnClickOutside);
   }
 }
 
