@@ -319,6 +319,13 @@ header nav[aria-expanded='true'] .nav-tools {
     --header-btn-radius: 12px;
   }
 
+  /* restore flex layout so hamburger (left) + search (right) sit side by side */
+  header nav[aria-expanded='false'] {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
   /* expanded: card panel instead of full-screen overlay */
   header nav[aria-expanded='true'] {
     position: fixed;
