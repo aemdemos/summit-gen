@@ -322,7 +322,7 @@ header nav[aria-expanded='true'] .nav-tools {
   /* expanded: card panel instead of full-screen overlay */
   header nav[aria-expanded='true'] {
     position: fixed;
-    inset: var(--header-padding) calc(var(--header-padding) + var(--header-btn-height) + 16px) auto var(--header-padding);
+    inset: var(--header-padding) var(--header-padding) auto var(--header-padding);
     height: auto;
     max-height: calc(100vh - 2 * var(--header-padding));
     background-color: #fff;
@@ -354,8 +354,7 @@ header nav[aria-expanded='true'] .nav-tools {
     margin-top: 0;
   }
 
-  /* hide search at 1024+ (shown again at 1340+) */
-  header nav .nav-tools,
+  /* hide search only when card panel is open */
   header nav[aria-expanded='true'] .nav-tools {
     display: none;
   }
@@ -446,21 +445,6 @@ header nav[aria-expanded='true'] .nav-tools {
   /* hide article image at desktop (keep title + description) */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3 ~ p:last-child {
     display: none;
-  }
-}
-
-/* ── 1340px+ : show search icon ── */
-@media (width >= 1340px) {
-  header nav .nav-tools {
-    display: block;
-  }
-
-  /* show search outside the card when nav is open */
-  header nav[aria-expanded='true'] .nav-tools {
-    display: block;
-    position: fixed;
-    top: var(--header-padding);
-    right: var(--header-padding);
   }
 }
 
