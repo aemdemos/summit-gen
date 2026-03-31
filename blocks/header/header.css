@@ -199,6 +199,10 @@ header nav[aria-expanded='true'] .nav-tools {
     --header-hamburger-bar-gap: 6px;
   }
 
+  header nav {
+    display: block;
+  }
+
   header nav[aria-expanded='true'] .nav-sections {
     margin-top: 0;
   }
@@ -306,6 +310,7 @@ header nav[aria-expanded='true'] .nav-tools {
 }
 
 /* ── 1024px+ : larger floating buttons ── */
+
 @media (width >= 1024px) {
   :root {
     --header-height: 124px;
@@ -313,10 +318,6 @@ header nav[aria-expanded='true'] .nav-tools {
     --header-btn-padding: 24px 30px;
     --header-btn-radius: 12px;
   }
-}
-
-/* ── 1200px+ : card panel nav ── */
-@media (width >= 1200px) {
   /* expanded: card panel instead of full-screen overlay */
   header nav[aria-expanded='true'] {
     position: fixed;
