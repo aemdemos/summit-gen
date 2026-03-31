@@ -6,5 +6,8 @@
       "environments": [ "dev", "preview", "live" ],
       "event": "aemedit"
     }
+  ],
+  "libraries": [
+    "https://main--summit-gen--aemdemos.aem.page/tools/sidekick/library.json"
   ]
 }
