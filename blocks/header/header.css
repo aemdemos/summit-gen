@@ -161,7 +161,7 @@ header nav .nav-tools {
   z-index: 2;
 }
 
-header nav .nav-tools .button {
+header nav .nav-tools a {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,6 +175,16 @@ header nav .nav-tools .button {
   color: var(--text-color);
   line-height: 0;
   cursor: pointer;
+}
+
+header nav .nav-tools .icon-search img {
+  width: 20px;
+  height: 20px;
+}
+
+/* hide tools when nav overlay is open */
+header nav[aria-expanded='true'] .nav-tools {
+  display: none;
 }
 
 /* ── 768px+ : tablet floating buttons ── */

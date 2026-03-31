@@ -250,8 +250,13 @@ export default async function decorate(block) {
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
     const search = navTools.querySelector('a[href*="search"]');
-    if (search && search.textContent === '') {
+    if (search) {
       search.setAttribute('aria-label', 'Search');
+      search.textContent = '';
+      const searchIcon = document.createElement('span');
+      searchIcon.className = 'icon icon-search';
+      search.append(searchIcon);
+      decorateIcons(navTools);
     }
   }
 
