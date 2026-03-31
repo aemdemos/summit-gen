@@ -242,6 +242,26 @@ header nav .nav-tools .button {
     margin-bottom: 16px;
   }
 
+  /* brand link: show SVG logo, hide text */
+  header nav .nav-brand-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0;
+    line-height: 0;
+  }
+
+  header nav .nav-brand-link .icon-genentech-logo {
+    display: inline-block;
+    width: 115px;
+    height: 15px;
+  }
+
+  header nav .nav-brand-link .icon-genentech-logo img {
+    width: 115px;
+    height: 15px;
+    display: block;
+  }
+
   /* hide article teaser after Quick Links list */
   /* stylelint-disable-next-line no-descending-specificity */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3,
@@ -258,7 +278,7 @@ header nav .nav-tools .button {
     white-space: nowrap;
     -webkit-font-smoothing: antialiased;
     line-height: 1.8125;
-    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     margin-top:8px;
     margin-bottom:0;
     font-weight: 450;
@@ -270,7 +290,7 @@ header nav .nav-tools .button {
     font-size:17px;
     letter-spacing:0.28px;
     -webkit-font-smoothing: antialiased;
-    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
 }

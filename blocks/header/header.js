@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 // gene.com uses hamburger at all sizes; this query is kept for escape/focus behavior
@@ -233,6 +233,14 @@ export default async function decorate(block) {
     if (brandBtn) {
       brandBtn.className = '';
       brandBtn.closest('.button-container').className = '';
+    }
+    const brandLink = navBrand.querySelector('a');
+    if (brandLink) {
+      brandLink.classList.add('nav-brand-link');
+      const logo = document.createElement('span');
+      logo.className = 'icon icon-genentech-logo';
+      brandLink.prepend(logo);
+      decorateIcons(navBrand);
     }
   }
 
