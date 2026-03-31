@@ -217,6 +217,19 @@ header nav .nav-tools .button {
   header nav[aria-expanded='true'] .nav-hamburger-icon::after {
     width: 18px;
   }
+
+  /* show logo in expanded overlay */
+  header nav[aria-expanded='true'] .nav-brand {
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  /* hide article teaser after Quick Links list */
+  /* stylelint-disable-next-line no-descending-specificity */
+  header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3,
+  header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3 ~ * {
+    display: none;
+  }
 }
 
 /* ── 1024px+ : larger floating buttons ── */
