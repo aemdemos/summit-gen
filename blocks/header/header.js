@@ -231,6 +231,26 @@ function decorateNavSections(navSections) {
 }
 
 /**
+ * Wraps article teaser content (h3 + following siblings) in a card div.
+ * @param {Element} navSections The nav sections container
+ */
+function wrapArticleTeaser(navSections) {
+  const dcw = navSections.querySelector('.default-content-wrapper');
+  if (!dcw) return;
+  const h3 = dcw.querySelector('h3');
+  if (!h3) return;
+  const card = document.createElement('div');
+  card.className = 'nav-article-teaser';
+  let el = h3;
+  while (el) {
+    const next = el.nextElementSibling;
+    card.append(el);
+    el = next;
+  }
+  dcw.append(card);
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -266,7 +286,10 @@ export default async function decorate(block) {
   }
 
   const navSections = nav.querySelector('.nav-sections');
-  if (navSections) decorateNavSections(navSections);
+  if (navSections) {
+    decorateNavSections(navSections);
+    wrapArticleTeaser(navSections);
+  }
 
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
