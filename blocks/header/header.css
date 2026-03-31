@@ -455,6 +455,20 @@ header nav[aria-expanded='true'] .nav-tools {
   }
 }
 
+/* ── 1340px+ : show search alongside open card panel ── */
+@media (width >= 1340px) {
+  header nav[aria-expanded='true'] {
+    inset: var(--header-padding) calc(var(--header-padding) + var(--header-btn-height) + 16px) auto var(--header-padding);
+  }
+
+  header nav[aria-expanded='true'] .nav-tools {
+    display: block;
+    position: fixed;
+    top: var(--header-padding);
+    right: var(--header-padding);
+  }
+}
+
 /* ── breadcrumbs ── */
 header .breadcrumbs {
   display: none;
