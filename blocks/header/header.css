@@ -318,6 +318,7 @@ header nav[aria-expanded='true'] .nav-tools {
     --header-btn-padding: 24px 30px;
     --header-btn-radius: 12px;
   }
+
   /* expanded: card panel instead of full-screen overlay */
   header nav[aria-expanded='true'] {
     position: fixed;
@@ -353,12 +354,10 @@ header nav[aria-expanded='true'] .nav-tools {
     margin-top: 0;
   }
 
-  /* show search outside the card */
+  /* hide search at 1024+ (shown again at 1340+) */
+  header nav .nav-tools,
   header nav[aria-expanded='true'] .nav-tools {
-    display: block;
-    position: fixed;
-    top: var(--header-padding);
-    right: var(--header-padding);
+    display: none;
   }
 
   /* content wrapper: 3-column grid for desktop layout */
@@ -447,6 +446,21 @@ header nav[aria-expanded='true'] .nav-tools {
   /* hide article image at desktop (keep title + description) */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > h3 ~ p:last-child {
     display: none;
+  }
+}
+
+/* ── 1340px+ : show search icon ── */
+@media (width >= 1340px) {
+  header nav .nav-tools {
+    display: block;
+  }
+
+  /* show search outside the card when nav is open */
+  header nav[aria-expanded='true'] .nav-tools {
+    display: block;
+    position: fixed;
+    top: var(--header-padding);
+    right: var(--header-padding);
   }
 }
 
