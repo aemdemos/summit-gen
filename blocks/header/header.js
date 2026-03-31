@@ -162,6 +162,54 @@ async function buildBreadcrumbs() {
 }
 
 /**
+ * Assigns nav-brand / nav-sections / nav-tools classes.
+ * When the fragment has only one section (e.g. DA nav), splits it
+ * into a brand section and a sections section programmatically.
+ */
+function classifyNavSections(nav) {
+  if (nav.children.length === 1) {
+    const single = nav.children[0];
+    const wrapper = single.querySelector('.default-content-wrapper') || single;
+    const brandLink = wrapper.querySelector('p > a');
+    const brandP = brandLink ? brandLink.closest('p') : null;
+    const brandSection = document.createElement('div');
+    brandSection.className = 'section nav-brand';
+    if (brandP) {
+      brandSection.appendChild(brandP.cloneNode(true));
+      brandP.remove();
+    }
+    single.classList.add('nav-sections');
+    single.classList.remove('nav-brand');
+    nav.insertBefore(brandSection, single);
+  } else {
+    ['brand', 'sections', 'tools'].forEach((c, i) => {
+      const section = nav.children[i];
+      if (section) section.classList.add(`nav-${c}`);
+    });
+  }
+}
+
+/**
+ * Decorates nav-sections with dropdown and click behaviour.
+ */
+function decorateNavSections(navSections) {
+  navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
+    if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
+    navSection.addEventListener('click', () => {
+      if (isDesktop.matches) {
+        const expanded = navSection.getAttribute('aria-expanded') === 'true';
+        toggleAllNavSections(navSections);
+        navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      }
+    });
+  });
+  navSections.querySelectorAll('.button-container').forEach((bc) => {
+    bc.classList.remove('button-container');
+    bc.querySelector('.button').classList.remove('button');
+  });
+}
+
+/**
  * loads and decorates the header, mainly the nav
  * @param {Element} block The header block element
  */
@@ -177,36 +225,19 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
-  });
+  classifyNavSections(nav);
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    const brandBtn = navBrand.querySelector('.button');
+    if (brandBtn) {
+      brandBtn.className = '';
+      brandBtn.closest('.button-container').className = '';
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');
-  if (navSections) {
-    navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
-      if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
-      navSection.addEventListener('click', () => {
-        if (isDesktop.matches) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        }
-      });
-    });
-    navSections.querySelectorAll('.button-container').forEach((buttonContainer) => {
-      buttonContainer.classList.remove('button-container');
-      buttonContainer.querySelector('.button').classList.remove('button');
-    });
-  }
+  if (navSections) decorateNavSections(navSections);
 
   const navTools = nav.querySelector('.nav-tools');
   if (navTools) {
@@ -216,7 +247,7 @@ export default async function decorate(block) {
     }
   }
 
-  // hamburger for mobile
+  // hamburger — always visible (gene.com uses hamburger at all sizes)
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
   hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
@@ -225,7 +256,6 @@ export default async function decorate(block) {
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
-  // always start collapsed — gene.com uses hamburger at all sizes
   toggleMenu(nav, navSections, false);
 
   const navWrapper = document.createElement('div');
