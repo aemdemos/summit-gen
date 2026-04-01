@@ -206,6 +206,7 @@ header nav .nav-search-btn {
   cursor: pointer;
   color: var(--text-color);
   line-height: 0;
+  margin:0;
 }
 
 header nav .nav-search .icon-search img {
@@ -410,7 +411,7 @@ header nav[aria-expanded='true'] .nav-tools {
   /* expanded search form at 1024+ */
   header nav .nav-search.nav-search-open .nav-search-form {
     gap: 16px;
-    width: 300px;
+    width: 240px;
   }
 
   header nav .nav-search.nav-search-open .nav-search-input {
