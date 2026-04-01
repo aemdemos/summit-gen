@@ -1,24 +1,39 @@
 /*
- * Copyright 2020 Adobe. All rights reserved.
- * This file is licensed to you under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License. You may obtain a copy
- * of the License at http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under
- * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
- * OF ANY KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Genentech Design System — AEM Edge Delivery Services
+ * Migrated from https://www.gene.com/
  */
 
 :root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
-  --overlay-background-color:lightgrey;
+  /* colors — primary */
+  --color-primary-dark: #30373d;
+  --color-black: #000;
+  --color-white: #fff;
+  --color-navy: #002e85;
+  --color-cyan: #00a5db;
+
+  /* colors — links & interactive */
+  --color-link: #0b41cd;
+  --color-link-hover: #3860be;
+
+  /* colors — neutrals */
+  --color-gray-dark: #505050;
+  --color-gray-medium: #696969;
+  --color-gray: #808080;
+  --color-gray-text: #555;
+  --color-warm-gray: #ebe6e0;
+  --color-warm-gray-light: #f0f3f3;
+  --color-light-gray: #edf0f1;
+  --color-warm-gray-gradient-start: #f3f1ed;
+  --color-warm-gray-gradient-end: #ebe6e1;
+
+  /* colors — semantic */
+  --background-color: var(--color-white);
+  --text-color: var(--color-primary-dark);
+  --link-color: var(--color-link);
+  --link-hover-color: var(--color-link-hover);
+  --light-color: var(--color-warm-gray-light);
+  --dark-color: var(--color-primary-dark);
+  --overlay-background-color: var(--color-warm-gray);
 
   /* fonts */
   --body-font-family: Gene-Sans-Regular, sans-serif;
@@ -43,44 +58,59 @@
   --heading-font-size-xs: 22px;
 
   /* layout */
-  --max-width-site: 1200px;
+  --max-width-site: 1377px;
+  --section-padding-inline: 20px;
 
   /* nav heights */
-  --nav-height: 64px;
+  --nav-height: 75px;
   --breadcrumbs-height: 34px;
   --header-height: var(--nav-height);
 
-  /* fixed-width / code */
-  --fixed-font-family: 'Roboto Mono', menlo, consolas, monospace;
+  /* button */
+  --button-border-radius: 50px;
+  --button-padding: 10px 48px;
+  --button-padding-small: 10px 32px;
 }
 
 /* fallback fonts */
 @font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
+  font-family: gene-sans-fallback;
+  size-adjust: 100%;
   src: local('Arial');
 }
 
 @font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
+  font-family: gene-serif-fallback;
+  size-adjust: 105%;
+  src: local('Georgia');
 }
 
-@media (width >= 900px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
+@font-face {
+  font-family: gene-condensed-fallback;
+  size-adjust: 90%;
+  src: local('Arial Narrow'), local('Arial');
+}
 
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
+/* tablet+ */
+@media (width >= 768px) {
+  :root {
+    --section-padding-inline: 32px;
+    --display-font-size-l: 50px;
+    --display-font-size-m: 40px;
+  }
+}
+
+/* desktop+ */
+@media (width >= 1024px) {
+  :root {
+    --heading-font-size-xxl: 50px;
     --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
+    --heading-font-size-l: 32px;
+    --heading-font-size-m: 27px;
+    --heading-font-size-s: 24px;
+    --heading-font-size-xs: 20px;
+    --body-font-size-m: 17px;
+    --body-font-size-s: 16px;
   }
 }
 
@@ -121,6 +151,7 @@ footer .footer[data-block-status="loaded"] {
   }
 }
 
+/* headings */
 h1,
 h2,
 h3,
@@ -133,6 +164,7 @@ h6 {
   font-weight: 400;
   line-height: 1.25;
   scroll-margin: 40px;
+  color: var(--text-color);
 }
 
 h1 { font-size: var(--heading-font-size-xxl); }
@@ -141,6 +173,16 @@ h3 { font-size: var(--heading-font-size-l); }
 h4 { font-size: var(--heading-font-size-m); }
 h5 { font-size: var(--heading-font-size-s); }
 h6 { font-size: var(--heading-font-size-xs); }
+
+/* display headings (hero/feature) use serif */
+h1.display,
+h2.display,
+h5.display {
+  font-family: var(--display-font-family);
+  font-weight: 400;
+  font-size: var(--display-font-size-l);
+  line-height: var(--line-height-display);
+}
 
 p,
 dl,
@@ -159,7 +201,7 @@ pre {
 }
 
 pre {
-  padding: 16px;
+  padding: var(--spacing-xs);
   border-radius: 8px;
   background-color: var(--light-color);
   overflow-x: auto;
@@ -189,49 +231,68 @@ a:hover {
   text-decoration: underline;
 }
 
-/* buttons */
+/* buttons — pill-shaped Genentech style */
 a.button,
-button {
+button.button {
   box-sizing: border-box;
   display: inline-block;
   max-width: 100%;
   margin: 12px 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
+  border: 0;
+  border-radius: var(--button-border-radius);
+  padding: var(--button-padding);
   font-family: var(--body-font-family);
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: var(--body-font-size-s);
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
-  background-color: var(--link-color);
-  color: var(--background-color);
+  background-color: var(--color-navy);
+  color: var(--color-white);
   cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: background-color 0.2s ease;
 }
 
 a.button:hover,
 a.button:focus,
-button:hover,
-button:focus {
-  background-color: var(--link-hover-color);
+button.button:hover,
+button.button:focus {
+  background-color: var(--color-link);
   cursor: pointer;
+}
+
+a.button.primary,
+button.button.primary {
+  background-color: var(--color-navy);
+  color: var(--color-white);
+}
+
+a.button.secondary,
+button.button.secondary {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-primary-dark);
+  color: var(--color-primary-dark);
+}
+
+a.button.accent,
+button.button.accent {
+  background-color: var(--color-white);
+  color: var(--text-color);
+}
+
+a.button.accent:hover,
+button.button.accent:hover {
+  background-color: var(--color-light-gray);
 }
 
 button:disabled,
 button:disabled:hover {
   background-color: var(--light-color);
   cursor: unset;
-}
-
-a.button.secondary,
-button.secondary {
-  background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color);
 }
 
 main img {
@@ -259,23 +320,58 @@ main > .section {
 main > .section > div {
   max-width: var(--max-width-site);
   margin: auto;
-  padding: 0 24px;
+  padding: 0 var(--section-padding-inline);
 }
 
 main > .section:first-of-type {
   margin-top: 0;
 }
 
-@media (width >= 900px) {
+@media (width >= 768px) {
   main > .section > div {
-    padding: 0 32px;
+    padding: 0 var(--section-padding-inline);
   }
 }
 
-/* section metadata */
+/* section metadata variants */
 main .section.light,
 main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+main .section.dark {
+  background-color: var(--color-primary-dark);
+  color: var(--color-white);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.dark h1,
+main .section.dark h2,
+main .section.dark h3,
+main .section.dark h4,
+main .section.dark h5,
+main .section.dark h6 {
+  color: var(--color-white);
+}
+
+main .section.dark a {
+  color: var(--color-cyan);
+}
+
+main .section.warm-gray {
+  background-color: var(--color-warm-gray);
+  margin: 0;
+  padding: 40px 0;
+}
+
+main .section.full-width > div {
+  max-width: none;
+  padding: 0;
+}
+
+main .section.no-margin {
+  margin: 0;
 }

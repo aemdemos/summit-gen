@@ -1,4 +1,5 @@
 /* columns design tokens */
 :root {
-  --columns-gap: 24px;
+  --columns-gap: 32px;
+  --columns-gap-desktop: 64px;
 }

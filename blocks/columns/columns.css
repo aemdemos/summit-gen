@@ -21,15 +21,46 @@
   display: block;
 }
 
+/* Genentech: CTA text styling within columns */
+.columns h5 {
+  font-family: var(--display-font-family);
+  font-size: var(--display-font-size-l);
+  font-weight: 400;
+  line-height: var(--line-height-display);
+  color: var(--color-black);
+  margin: 0 0 var(--spacing-m);
+}
+
+.columns > div > div:not(.columns-img-col) p {
+  font-size: var(--body-font-size-l);
+  line-height: 1.56;
+  color: var(--color-black);
+}
+
+/* White pill CTA button in columns */
+.columns a.button {
+  background-color: var(--color-white);
+  color: var(--text-color);
+  letter-spacing: 0.48px;
+}
+
+.columns a.button:hover {
+  background-color: var(--color-light-gray);
+}
+
 @media (width >= 900px) {
   .columns > div {
     align-items: center;
     flex-direction: unset;
-    gap: var(--columns-gap);
+    gap: var(--columns-gap-desktop);
   }
 
   .columns > div > div {
     flex: 1;
     order: unset;
+  }
+
+  .columns > div > div:not(.columns-img-col) {
+    padding: var(--spacing-xxl) var(--spacing-xl);
   }
 }

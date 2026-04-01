@@ -1,4 +1,4 @@
-@import url('./header-tokens.css');
+/* Genentech Header — floating transparent nav with hamburger menu panel */
 
 /* ── nav wrapper: transparent overlay ── */
 header .nav-wrapper {
@@ -62,19 +62,30 @@ header nav .nav-hamburger-icon::after {
   width: var(--header-hamburger-bar-width);
 }
 
-header nav .nav-hamburger-icon::before,
-header nav .nav-hamburger-icon::after {
-  content: '';
-  position: absolute;
-  background: currentcolor;
+/* ---- Quick links ---- */
+header nav .nav-quick-links {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-header nav[aria-expanded='false'] .nav-hamburger-icon,
-header nav[aria-expanded='false'] .nav-hamburger-icon::before,
-header nav[aria-expanded='false'] .nav-hamburger-icon::after {
-  height: var(--header-hamburger-bar-height);
-  border-radius: 2px;
-  background: currentcolor;
+header nav .nav-quick-links-label {
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-gray);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+header nav .nav-quick-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 32px;
 }
 
 header nav[aria-expanded='false'] .nav-hamburger-icon::before {
@@ -89,21 +100,25 @@ header nav[aria-expanded='true'] .nav-hamburger-icon {
   height: 22px;
 }
 
-header nav[aria-expanded='true'] .nav-hamburger-icon::before,
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: 3px;
-  left: 1px;
-  transform: rotate(45deg);
-  transform-origin: 2px 1px;
-  width: 24px;
-  height: var(--header-hamburger-bar-height);
-  border-radius: 2px;
+/* ---- Featured card ---- */
+header nav .nav-featured-card {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-light-gray);
+  transition: box-shadow 0.2s ease;
+  max-height: 120px;
 }
 
-header nav[aria-expanded='true'] .nav-hamburger-icon::after {
-  top: unset;
-  bottom: 3px;
-  transform: rotate(-45deg);
+header nav .nav-featured-card:hover {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  text-decoration: none;
+  color: var(--color-primary-dark);
 }
 
 /* ── brand: hidden in the floating header ── */
@@ -644,28 +659,21 @@ header .breadcrumbs {
   overflow: hidden;
 }
 
-header .breadcrumbs ol {
-  display: flex;
-  flex-flow: wrap;
-  list-style: none;
-  padding: 0;
-  margin-top: 0;
-  margin-bottom: 0;
-  gap: 1ch;
-}
+  header nav[aria-expanded='true'] .nav-panel {
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+  }
 
-/* stylelint-disable-next-line no-descending-specificity */
-header .breadcrumbs ol li {
-  padding: 0;
-  color: var(--dark-color);
-}
+  header nav .nav-links {
+    grid-column: 1 / -1;
+  }
 
-header .breadcrumbs ol li:not(:last-child)::after {
-  content: '/';
-  padding-left: 1ch;
-}
+  header nav .nav-quick-links {
+    grid-column: 1 / -1;
+  }
 
-/* stylelint-disable-next-line no-descending-specificity */
-header .breadcrumbs ol li[aria-current] {
-  color: var(--text-color);
+  header nav .nav-featured-card {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
 }
