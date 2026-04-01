@@ -49,39 +49,27 @@ function openOnKeydown(e) {
   }
 }
 
-  if (hamburgerIcon) hamburgerIcon.style.display = expanded ? '' : 'none';
-  if (closeIcon) closeIcon.style.display = expanded ? 'none' : '';
-
-  document.body.style.overflowY = expanded ? '' : 'hidden';
-
-  if (!expanded) {
-    window.addEventListener('keydown', closeOnEscape);
-  } else {
-    window.removeEventListener('keydown', closeOnEscape);
-  }
+function focusNavSection() {
+  document.activeElement.addEventListener('keydown', openOnKeydown);
 }
 
 /**
- * Builds the nav-links row from an <ul> of top-level links
- * @param {Element} ul The unordered list element
- * @returns {Element}
+ * Toggles all nav sections
+ * @param {Element} sections The container element
+ * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
-function buildNavLinks(ul) {
-  const navLinks = document.createElement('nav');
-  navLinks.className = 'nav-links';
-  navLinks.setAttribute('aria-label', 'Main navigation');
-  ul.querySelectorAll(':scope > li > a').forEach((a) => {
-    const link = a.cloneNode(true);
-    navLinks.append(link);
+function toggleAllNavSections(sections, expanded = false) {
+  if (!sections) return;
+  sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
+    section.setAttribute('aria-expanded', expanded);
   });
-  return navLinks;
 }
 
 /**
- * Builds the quick links section
- * @param {string} label The label text
- * @param {Element} ul The quick links list
- * @returns {Element}
+ * Toggles the entire nav
+ * @param {Element} nav The container element
+ * @param {Element} navSections The nav sections within the container element
+ * @param {*} forceExpanded Optional param to force nav expand behavior when not null
  */
 function toggleMenu(nav, navSections, forceExpanded = null) {
   const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
@@ -129,57 +117,70 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   }
 }
 
-  const list = document.createElement('ul');
-  ul.querySelectorAll(':scope > li > a').forEach((a) => {
-    const li = document.createElement('li');
-    const link = a.cloneNode(true);
-    li.append(link);
-    list.append(li);
-  });
-  wrapper.append(list);
-
-  return wrapper;
+function getDirectTextContent(menuItem) {
+  const menuLink = menuItem.querySelector(':scope > :where(a,p)');
+  if (menuLink) {
+    return menuLink.textContent.trim();
+  }
+  return Array.from(menuItem.childNodes)
+    .filter((n) => n.nodeType === Node.TEXT_NODE)
+    .map((n) => n.textContent)
+    .join(' ');
 }
 
-/**
- * Builds the featured article card
- * @param {string} title Card title
- * @param {string} description Card description
- * @param {string} href Card link
- * @param {Element} picture Card image
- * @returns {Element}
- */
-function buildFeaturedCard(title, description, href, picture) {
-  const card = document.createElement('a');
-  card.className = 'nav-featured-card';
-  card.href = href;
+const MAX_BREADCRUMB_DEPTH = 20;
 
-  const textDiv = document.createElement('div');
-  textDiv.className = 'nav-featured-text';
+async function buildBreadcrumbsFromNavTree(nav, currentUrl) {
+  const crumbs = [];
 
-  const h3 = document.createElement('h3');
-  h3.textContent = title;
-  textDiv.append(h3);
+  const homeUrl = document.querySelector('.nav-brand a[href]').href;
 
-  const p = document.createElement('p');
-  p.textContent = description;
-  textDiv.append(p);
-
-  card.append(textDiv);
-
-  if (picture) {
-    const imgDiv = document.createElement('div');
-    imgDiv.className = 'nav-featured-image';
-    imgDiv.append(picture);
-
-    const arrow = document.createElement('span');
-    arrow.className = 'icon icon-arrow-right';
-    imgDiv.append(arrow);
-
-    card.append(imgDiv);
+  let menuItem = Array.from(nav.querySelectorAll('a')).find((a) => a.href === currentUrl);
+  if (menuItem) {
+    let depth = 0;
+    do {
+      const link = menuItem.querySelector(':scope > a');
+      crumbs.unshift({ title: getDirectTextContent(menuItem), url: link ? link.href : null });
+      menuItem = menuItem.closest('ul')?.closest('li');
+      depth += 1;
+    } while (menuItem && depth < MAX_BREADCRUMB_DEPTH);
+  } else if (currentUrl !== homeUrl) {
+    crumbs.unshift({ title: getMetadata('og:title'), url: currentUrl });
   }
 
-  return card;
+  crumbs.unshift({ title: 'Home', url: homeUrl });
+
+  // last link is current page and should not be linked
+  if (crumbs.length > 1) {
+    crumbs.at(-1).url = null;
+  }
+  crumbs.at(-1)['aria-current'] = 'page';
+  return crumbs;
+}
+
+async function buildBreadcrumbs() {
+  const breadcrumbs = document.createElement('nav');
+  breadcrumbs.className = 'breadcrumbs';
+
+  const crumbs = await buildBreadcrumbsFromNavTree(document.querySelector('.nav-sections'), document.location.href);
+
+  const ol = document.createElement('ol');
+  ol.append(...crumbs.map((item) => {
+    const li = document.createElement('li');
+    if (item['aria-current']) li.setAttribute('aria-current', item['aria-current']);
+    if (item.url) {
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.textContent = item.title;
+      li.append(a);
+    } else {
+      li.textContent = item.title;
+    }
+    return li;
+  }));
+
+  breadcrumbs.append(ol);
+  return breadcrumbs;
 }
 
 /**
@@ -255,12 +256,12 @@ function wrapArticleTeaser(navSections) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
 
-  if (!fragment) return;
-
+  // decorate nav DOM
   block.textContent = '';
   const nav = document.createElement('nav');
   nav.id = 'nav';
@@ -392,7 +393,7 @@ export default async function decorate(block) {
   navWrapper.append(nav);
   block.append(navWrapper);
 
-  // Decorate icons
-  const { decorateIcons } = await import('../../scripts/aem.js');
-  await decorateIcons(nav);
+  if (getMetadata('breadcrumbs').toLowerCase() === 'true') {
+    navWrapper.append(await buildBreadcrumbs());
+  }
 }
