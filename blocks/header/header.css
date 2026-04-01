@@ -13,7 +13,6 @@ header .nav-wrapper {
 /* ── nav layout: hamburger left, tools right ── */
 header nav {
   box-sizing: border-box;
-  display: flex;
   justify-content: space-between;
   align-items: flex-start;
   height: var(--header-height);
@@ -199,12 +198,14 @@ header nav[aria-expanded='true'] .nav-tools {
 
   header nav {
     align-items: start;
-    display: flex;
-    gap: 15px;
     justify-content: space-between;
     width: 100%;
     padding: 25px;
     margin: 0 auto;
+  }
+
+  header nav[aria-expanded='false'] {
+    display: flex;
   }
 
   header nav[aria-expanded='true'] .nav-sections {
@@ -343,6 +344,7 @@ header nav[aria-expanded='true'] .nav-tools {
     overflow-y: auto;
     flex-flow: row wrap;
     align-items: flex-start;
+    width:95%;
   }
 
   /* hide hamburger/close inside the card */
@@ -557,8 +559,13 @@ header nav[aria-expanded='true'] .nav-tools {
 
 /* ── 1340px+ : show search alongside open card panel ── */
 @media (width >= 1340px) {
+  :root {
+    --header-padding: 22px;
+  }
+
   header nav[aria-expanded='true'] {
-    inset: var(--header-padding) calc(var(--header-padding) + var(--header-btn-height) + 16px) auto var(--header-padding);
+    inset: var(--header-padding) calc(var(--header-padding) + var(--header-btn-height) + 20px) auto var(--header-padding);
+  width:90%;
   }
 
   header nav[aria-expanded='true'] .nav-tools {
