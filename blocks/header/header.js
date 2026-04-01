@@ -4,6 +4,7 @@ import { loadFragment } from '../fragment/fragment.js';
 // gene.com uses hamburger at all sizes; this query is kept for escape/focus behavior
 const isDesktop = window.matchMedia('(min-width: 900px)');
 const isLargeDesktop = window.matchMedia('(min-width: 1024px)');
+const isSearchAlongsideNav = window.matchMedia('(min-width: 1340px)');
 
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
@@ -340,6 +341,9 @@ export default async function decorate(block) {
           }
         } else {
           searchWrapper.classList.add('nav-search-open');
+          if (isSearchAlongsideNav.matches && nav.getAttribute('aria-expanded') === 'true') {
+            toggleMenu(nav, navSections, false);
+          }
           input.focus();
         }
       });
