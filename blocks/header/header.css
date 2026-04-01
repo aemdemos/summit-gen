@@ -159,7 +159,13 @@ header nav .nav-tools {
   z-index: 2;
 }
 
-header nav .nav-tools a {
+/* ── search: floating pill button / expandable form ── */
+header nav .nav-search {
+  display: flex;
+  align-items: center;
+}
+
+header nav .nav-search-form {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,11 +176,39 @@ header nav .nav-tools a {
   border-radius: var(--header-btn-radius);
   box-shadow: var(--header-btn-shadow);
   color: var(--text-color);
-  line-height: 0;
-  cursor: pointer;
+  gap: 0;
+  transition: width 0.25s ease;
 }
 
-header nav .nav-tools .icon-search img {
+header nav .nav-search-input {
+  display: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  font-family: var(--body-font-family);
+  color: var(--text-color);
+  padding: 0;
+  width: 0;
+}
+
+header nav .nav-search-input::placeholder {
+  color: #999;
+}
+
+header nav .nav-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-color);
+  line-height: 0;
+}
+
+header nav .nav-search .icon-search img {
   width: 20px;
   height: 20px;
 }
@@ -373,6 +407,17 @@ header nav[aria-expanded='true'] .nav-tools {
     display: none;
   }
 
+  /* expanded search form at 1024+ */
+  header nav .nav-search.nav-search-open .nav-search-form {
+    gap: 16px;
+    width: 300px;
+  }
+
+  header nav .nav-search.nav-search-open .nav-search-input {
+    display: block;
+    width: 100%;
+  }
+
   /* content wrapper: 3-column grid for desktop layout */
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper {
     display: grid;
@@ -399,8 +444,7 @@ header nav[aria-expanded='true'] .nav-tools {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    margin-top: 0;
-    margin-bottom: 0px;
+    margin-bottom: 0;
     padding-left: 128px;
     margin-top:-2px;
   }
@@ -456,6 +500,7 @@ header nav[aria-expanded='true'] .nav-tools {
     overflow: hidden;
     box-shadow: 0 0 4.7px #ebe6e0;
     max-width: 100%;
+
     --nav-teaser-img-height: 140px;
   }
 
@@ -502,10 +547,9 @@ header nav[aria-expanded='true'] .nav-tools {
     grid-row: 1 / -1;
     display: block;
     margin: 0;
-    align-self: center;
+    place-self: center end;
     position: relative;
     width: calc(80px + min(1, (100vw - 1024px) / 176px) * 120px);
-    justify-self: end;
   }
 
   header nav[aria-expanded='true'] .nav-article-teaser > p:last-of-type picture {

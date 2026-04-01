@@ -295,12 +295,81 @@ export default async function decorate(block) {
   if (navTools) {
     const search = navTools.querySelector('a[href*="search"]');
     if (search) {
-      search.setAttribute('aria-label', 'Search');
-      search.textContent = '';
+      const searchHref = search.href;
+      // Build search form container
+      const searchWrapper = document.createElement('div');
+      searchWrapper.className = 'nav-search';
+
+      const form = document.createElement('form');
+      form.action = new URL(searchHref, window.location).pathname;
+      form.method = 'GET';
+      form.className = 'nav-search-form';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.name = 'q';
+      input.placeholder = 'Search';
+      input.className = 'nav-search-input';
+      input.autocomplete = 'off';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'nav-search-btn';
+      btn.setAttribute('aria-label', 'Search');
       const searchIcon = document.createElement('span');
       searchIcon.className = 'icon icon-search';
-      search.append(searchIcon);
+      btn.append(searchIcon);
+
+      form.append(input, btn);
+      searchWrapper.append(form);
+
+      // Replace the original link with the search wrapper
+      search.replaceWith(searchWrapper);
       decorateIcons(navTools);
+
+      // Toggle open/close on icon click
+      btn.addEventListener('click', () => {
+        const isOpen = searchWrapper.classList.contains('nav-search-open');
+        if (isOpen) {
+          // If there's a query, submit the form
+          if (input.value.trim()) {
+            form.submit();
+          } else {
+            searchWrapper.classList.remove('nav-search-open');
+            input.value = '';
+          }
+        } else {
+          searchWrapper.classList.add('nav-search-open');
+          input.focus();
+        }
+      });
+
+      // Submit on Enter
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (input.value.trim()) {
+            form.submit();
+          }
+        }
+      });
+
+      // Close on Escape
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          searchWrapper.classList.remove('nav-search-open');
+          input.value = '';
+        }
+      });
+
+      // Close on click outside
+      document.addEventListener('click', (e) => {
+        if (!searchWrapper.contains(e.target)
+          && searchWrapper.classList.contains('nav-search-open')) {
+          searchWrapper.classList.remove('nav-search-open');
+          input.value = '';
+        }
+      });
     }
   }
 
