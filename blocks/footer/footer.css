@@ -22,9 +22,12 @@ footer .footer-logo {
   padding-bottom: 24px;
 }
 
-footer .footer-logo .icon {
-  width: 213px;
-  height: 50px;
+footer .footer-logo .icon,
+footer .footer-logo picture,
+footer .footer-logo img {
+  display: block;
+  width: 200px;
+  height: auto;
 }
 
 footer .footer-logo a {

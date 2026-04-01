@@ -85,32 +85,46 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   const sections = [...fragment.children];
 
-  // Detect whether fragment has 5 sections (full) or 3 sections (DA: nav, legal, copyright)
-  const hasFiveSections = sections.length >= 5;
+  // Detect section layout by checking if first section has nav lists or is a logo
+  const firstHasLists = sections[0]?.querySelector('ul');
+  let navIdx;
 
-  if (hasFiveSections) {
-    // Full fragment: logo | nav | social | legal | copyright
-    footer.append(extractContent(sections[0]));
-    footer.firstElementChild.className = 'footer-logo';
-    footer.append(buildNav(sections[1]));
-    const social = extractContent(sections[2]);
+  if (firstHasLists) {
+    // No logo section from DA — build from code
+    footer.append(buildLogo());
+    navIdx = 0;
+  } else {
+    // First section is the logo (image or icon link from DA)
+    const logo = extractContent(sections[0]);
+    logo.className = 'footer-logo';
+    footer.append(logo);
+    navIdx = 1;
+  }
+
+  // Nav section (contains all the <ul> lists)
+  footer.append(buildNav(sections[navIdx]));
+
+  // Social section — check if next section has social links, otherwise build from code
+  const socialIdx = navIdx + 1;
+  const socialSection = sections[socialIdx];
+  const hasSocialLinks = socialSection?.querySelector('a[href*="facebook"], a[href*="twitter"], a[href*="linkedin"]');
+  if (hasSocialLinks) {
+    const social = extractContent(socialSection);
     social.className = 'footer-social';
     footer.append(social);
-    const legal = extractContent(sections[3]);
-    legal.className = 'footer-legal';
-    footer.append(legal);
-    const copy = extractContent(sections[4]);
-    copy.className = 'footer-copyright';
-    footer.append(copy);
   } else {
-    // DA fragment: nav | legal | copyright — build logo + social from code
-    footer.append(buildLogo());
-    footer.append(buildNav(sections[0]));
     footer.append(buildSocial());
-    const legal = extractContent(sections[1]);
+  }
+
+  // Remaining sections: legal then copyright
+  const legalIdx = hasSocialLinks ? socialIdx + 1 : socialIdx;
+  if (sections[legalIdx]) {
+    const legal = extractContent(sections[legalIdx]);
     legal.className = 'footer-legal';
     footer.append(legal);
-    const copy = extractContent(sections[2]);
+  }
+  if (sections[legalIdx + 1]) {
+    const copy = extractContent(sections[legalIdx + 1]);
     copy.className = 'footer-copyright';
     footer.append(copy);
   }
