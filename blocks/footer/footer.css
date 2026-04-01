@@ -165,6 +165,11 @@ footer .footer-copyright {
     flex-direction: unset;
   }
 
+  /* At 768+ the 4th nav column (Now Hiring) tucks under the 3rd column */
+  footer .footer-nav-column:nth-child(4) {
+    grid-column: 3;
+  }
+
   footer .footer-nav-column {
     gap: 28px;
   }
@@ -183,9 +188,20 @@ footer .footer-copyright {
   }
 }
 
-/* Desktop+ */
-@media (width >= 900px) {
+/* Desktop+: 5 columns — logo | 4 nav columns */
+@media (width >= 1024px) {
   footer .footer > div {
     padding: var(--footer-padding-desktop);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  footer .footer-nav {
+    grid-column: 2 / span 4;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Reset: all 4 nav columns flow naturally at 1024+ */
+  footer .footer-nav-column:nth-child(4) {
+    grid-column: auto;
   }
 }

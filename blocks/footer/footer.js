@@ -40,8 +40,10 @@ function buildNav(section) {
   const lists = [...section.querySelectorAll('ul')];
   if (lists.length === 0) return navEl;
 
-  // Distribute lists into 3 visual columns: 2 + 4 + 4
-  const colSizes = [2, 4, 4];
+  // Distribute lists into 4 visual columns: 2 + 3 + 4 + 1
+  // At 768+ CSS shows 3 nav columns (last wraps under col 3)
+  // At 1024+ CSS shows all 4 nav columns
+  const colSizes = [2, 3, 4, 1];
   let listIndex = 0;
   colSizes.forEach((count) => {
     const column = document.createElement('div');
