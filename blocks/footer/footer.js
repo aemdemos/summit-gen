@@ -8,10 +8,11 @@ function buildNav(section) {
   const lists = [...section.querySelectorAll('ul')];
   if (lists.length === 0) return navEl;
 
-  // Distribute lists into 4 visual columns: 2 + 3 + 4 + 1
+  // Distribute lists into 4 visual columns: 2 + 3 + 4 + 2
+  // Last column has Now Hiring + legal links (with — separator)
   // At 768+ CSS shows 3 nav columns (last wraps under col 3)
   // At 1024+ CSS shows all 4 nav columns
-  const colSizes = [2, 3, 4, 1];
+  const colSizes = [2, 3, 4, 2];
   let listIndex = 0;
   colSizes.forEach((count) => {
     const column = document.createElement('div');
@@ -53,36 +54,23 @@ export default async function decorate(block) {
   const sections = [...fragment.children];
 
   // Walk through sections and classify each by its content
-  const classNames = [];
   sections.forEach((section) => {
     const hasLists = section.querySelector('ul');
     const hasSocialLinks = section.querySelector('a[href*="facebook"], a[href*="twitter"], a[href*="linkedin"]');
-    const hasOnlyParagraph = !hasLists && !hasSocialLinks
-      && section.querySelector('p') && !section.querySelector('a[href*="/"]');
 
     if (hasLists && !hasSocialLinks) {
-      // Check if this is nav (many lists) or legal (single list with few items)
-      const listItems = section.querySelectorAll('li');
-      if (listItems.length > 10) {
-        classNames.push('nav');
-      } else {
-        classNames.push('legal');
-      }
+      footer.append(buildNav(section));
     } else if (hasSocialLinks) {
-      classNames.push('social');
-    } else if (hasOnlyParagraph) {
-      classNames.push('copyright');
+      const div = extractContent(section);
+      div.className = 'footer-social';
+      footer.append(div);
+    } else if (section.querySelector('img, .icon, picture')) {
+      const div = extractContent(section);
+      div.className = 'footer-logo';
+      footer.append(div);
     } else {
-      classNames.push('logo');
-    }
-  });
-
-  classNames.forEach((cls, i) => {
-    if (cls === 'nav') {
-      footer.append(buildNav(sections[i]));
-    } else {
-      const div = extractContent(sections[i]);
-      div.className = `footer-${cls}`;
+      const div = extractContent(section);
+      div.className = 'footer-copyright';
       footer.append(div);
     }
   });
