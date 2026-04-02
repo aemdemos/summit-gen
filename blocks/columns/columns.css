@@ -58,7 +58,7 @@
     display: flex;
     gap: 32px;
     margin: 0 auto;
-    max-width: 1140px;
+    max-width: 1050px;
     position: relative;
     width: 100%;
     flex-direction: column-reverse;
@@ -109,7 +109,7 @@
         padding-left: 25px;
         padding-right: 25px;
         padding-top: 34px;
-        padding-bottom: 64px;
+        padding-bottom: 55px;
   }
 
   .columns > div > .columns-img-col img {
