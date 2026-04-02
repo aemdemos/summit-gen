@@ -1,73 +1,109 @@
 @import url('./video-tokens.css');
 
+/* Full-width background video section */
 .video {
-  text-align: center;
-  max-width: var(--video-max-width);
-  margin: var(--video-margin);
-}
-
-.video[data-embed-loaded='false']:not(.placeholder) {
-  /* reserve an approximate space to avoid extensive layout shifts */
-  aspect-ratio: var(--video-aspect-ratio);
-}
-
-.video > div {
-  display: flex;
-  justify-content: center;
-}
-
-.video video {
-  max-width: 100%;
-}
-
-.video .video-placeholder {
-  width: 100%;
-  aspect-ratio: var(--video-aspect-ratio);
   position: relative;
-}
-
-.video .video-placeholder > * {
+  width: 100%;
+  min-height: 400px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: none;
+  margin: 0;
+  background-color: #000;
+}
+
+/* Background video: fills container, covers like a poster image */
+.video .video-bg {
   position: absolute;
   inset: 0;
-}
-
-.video[data-embed-loaded='true'] .video-placeholder,
-.video[data-embed-loaded='false'] .video-placeholder + * {
-  visibility: hidden;
-  height: 0;
-  width: 0;
-}
-
-.video .video-placeholder picture img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 0;
 }
 
-.video .video-placeholder-play button {
+/* Text overlay: centered on top of video */
+.video .video-overlay {
   position: relative;
-  display: block;
-  width: var(--video-placeholder-play-size);
-  height: var(--video-placeholder-play-size);
-  border-radius: 50%;
-  outline: 2px solid;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 24px;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* Heading */
+.video .video-overlay h5 {
+  font-family: gene-sans-regular, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #fff;
+  margin: 0 0 16px;
+}
+
+/* Description */
+.video .video-overlay p {
+  font-family: gene-sans-regular, sans-serif;
+  font-size: 16px;
+  line-height: 1.56;
+  color: #fff;
+  margin: 16px 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* "Watch Now" pill button */
+.video .video-overlay a {
+  display: inline-block;
+  background-color: #fff;
+  color: #30373d;
+  font-size: 16px;
+  font-family: gene-sans-regular, sans-serif;
+  padding: 10px 48px;
+  border-radius: 50px;
+  text-decoration: none;
+  border: none;
+  transition: background-color 0.15s;
+  -webkit-font-smoothing: antialiased;
+}
+
+.video .video-overlay a:hover {
+  background-color: #f0f0f0;
+}
+
+/* Strip button/em wrapper styling that EDS may add */
+.video .video-overlay em {
+  font-style: normal;
+}
+
+.video .video-overlay .button-container {
+  margin: 0;
   padding: 0;
 }
 
-.video .video-placeholder-play button::before {
-  content: '';
-  display: block;
-  box-sizing: border-box;
-  position: absolute;
-  width: 0;
-  height: var(--video-placeholder-play-triangle-height);
-  border-top: 12px solid transparent;
-  border-bottom: 12px solid transparent;
-  border-left: var(--video-placeholder-play-triangle-width) solid;
-  top: 50%;
-  left: calc(50% + var(--video-placeholder-play-left-offset));
-  transform: translate(-50%, -50%);
+/* ── Desktop: 1024px+ — larger text, full viewport height ── */
+@media (width >= 1024px) {
+  .video {
+    min-height: 100vh;
+  }
+
+  .video .video-overlay {
+    padding: 0;
+    margin: 0 179px;
+  }
+
+  .video .video-overlay h5 {
+    font-size: 30px;
+    margin: 0 0 20px;
+  }
+
+  .video .video-overlay p {
+    font-size: 20px;
+    line-height: 28px;
+    margin: 20px 0;
+    max-width: 550px;
+    text-shadow: 0 0 20px #00000087;
+  }
 }

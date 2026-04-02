@@ -1,35 +1,17 @@
 /*
  * Video Block
- * Show a video referenced by a link
- * https://www.hlx.live/developer/block-collection/video
+ * Two-row layout: Row 1 = video source link, Row 2 = text overlay content.
+ * Renders a full-viewport background video with centered text on top.
  */
-
-import { ensureDOMPurify } from '../../scripts/scripts.js';
-import { DOMPURIFY } from '../../scripts/aem.js';
-import { getYoutubeEmbedHtml, getVimeoEmbedHtml } from '../../scripts/utils.js';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-async function htmlToElement(html) {
-  await ensureDOMPurify();
-  const temp = document.createElement('div');
-  temp.innerHTML = window.DOMPurify.sanitize(html, DOMPURIFY);
-  return temp.firstElementChild;
-}
-
-function getVideoElement(source, autoplay, background) {
+function getVideoElement(source) {
   const video = document.createElement('video');
-  video.setAttribute('controls', '');
-  if (autoplay) video.setAttribute('autoplay', '');
-  if (background) {
-    video.setAttribute('loop', '');
-    video.setAttribute('playsinline', '');
-    video.removeAttribute('controls');
-    video.addEventListener('canplay', () => {
-      video.muted = true;
-      if (autoplay) video.play();
-    });
-  }
+  video.setAttribute('loop', '');
+  video.setAttribute('playsinline', '');
+  video.setAttribute('muted', '');
+  video.muted = true;
 
   const sourceEl = document.createElement('source');
   sourceEl.setAttribute('src', source);
@@ -39,70 +21,42 @@ function getVideoElement(source, autoplay, background) {
   return video;
 }
 
-const loadVideoEmbed = async (block, link, autoplay, background) => {
-  if (block.dataset.embedLoaded === 'true') {
-    return;
-  }
-  const url = new URL(link);
-
-  const isYoutube = link.includes('youtube') || link.includes('youtu.be');
-  const isVimeo = link.includes('vimeo');
-
-  if (isYoutube) {
-    const embedWrapper = await htmlToElement(getYoutubeEmbedHtml(url, autoplay, background));
-    block.append(embedWrapper);
-    embedWrapper.querySelector('iframe').addEventListener('load', () => {
-      block.dataset.embedLoaded = true;
-    });
-  } else if (isVimeo) {
-    const embedWrapper = await htmlToElement(getVimeoEmbedHtml(url, autoplay, background));
-    block.append(embedWrapper);
-    embedWrapper.querySelector('iframe').addEventListener('load', () => {
-      block.dataset.embedLoaded = true;
-    });
-  } else {
-    const videoEl = getVideoElement(link, autoplay, background);
-    block.append(videoEl);
-    videoEl.addEventListener('canplay', () => {
-      block.dataset.embedLoaded = true;
-    });
-  }
-};
-
 export default async function decorate(block) {
-  const placeholder = block.querySelector('picture');
-  const link = block.querySelector('a').href;
+  // EDS wraps block rows inside a single <div>; get the actual row cells
+  const wrapper = block.children[0];
+  const cells = wrapper ? [...wrapper.children] : [...block.children];
+  if (cells.length < 2) return;
+
+  // Cell 1: video source link
+  const videoLink = cells[0].querySelector('a')?.href;
+
+  // Cell 2: text overlay (heading, description, CTA)
+  const overlayContent = cells[1];
+
+  // Clear block and rebuild
   block.textContent = '';
-  block.dataset.embedLoaded = false;
 
-  const autoplay = block.classList.contains('autoplay');
-  if (placeholder) {
-    block.classList.add('placeholder');
-    const wrapper = document.createElement('div');
-    wrapper.className = 'video-placeholder';
-    wrapper.append(placeholder);
+  // Background video
+  if (videoLink) {
+    const video = getVideoElement(videoLink);
+    video.className = 'video-bg';
+    block.append(video);
 
-    if (!autoplay) {
-      wrapper.insertAdjacentHTML(
-        'beforeend',
-        '<div class="video-placeholder-play"><button type="button" title="Play"></button></div>',
-      );
-      wrapper.addEventListener('click', () => {
-        wrapper.remove();
-        loadVideoEmbed(block, link, true, false);
+    // Autoplay when visible (unless reduced motion)
+    if (!prefersReducedMotion.matches) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          observer.disconnect();
+          video.play().catch(() => {});
+        }
       });
+      observer.observe(block);
     }
-    block.append(wrapper);
   }
 
-  if (!placeholder || autoplay) {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        observer.disconnect();
-        const playOnLoad = autoplay && !prefersReducedMotion.matches;
-        loadVideoEmbed(block, link, playOnLoad, autoplay);
-      }
-    });
-    observer.observe(block);
-  }
+  // Text overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'video-overlay';
+  [...overlayContent.childNodes].forEach((child) => overlay.append(child.cloneNode(true)));
+  block.append(overlay);
 }
