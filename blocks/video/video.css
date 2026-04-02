@@ -2,8 +2,7 @@
 
 .video {
   text-align: center;
-  max-width: var(--video-max-width);
-  margin: var(--video-margin);
+  margin: 0;
 }
 
 .video[data-embed-loaded='false']:not(.placeholder) {

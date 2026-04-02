@@ -338,6 +338,11 @@ main > .section:is(.columns-container, .cards-container) > div {
   padding-inline: 0;
 }
 
+/* Section that contains a video block — full-bleed inner wrapper */
+main > .section:has(.video) > div {
+  padding: 0;
+}
+
 /* section metadata variants */
 main .section.light,
 main .section.highlight {
