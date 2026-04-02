@@ -35,36 +35,23 @@ footer .footer-logo a {
   color: var(--color-black);
 }
 
-/* Navigation: mobile stacks; 768+ logo + 3 nav columns in footer grid */
+/* Navigation — mobile: single column stack */
 footer .footer-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
   padding-bottom: 32px;
-}
-
-footer .footer-nav-column {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  min-width: 0;
-}
-
-footer .footer-nav-col {
-  min-width: 0;
 }
 
 footer .footer-nav ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px;
+  break-inside: avoid;
 }
 
 footer .footer-nav li {
   margin: 0 0 .5rem;
 }
 
-/* First item in each column is the section heading */
+/* First item in each list is the section heading */
 footer .footer-nav li:first-child a {
   font-weight: 700;
   font-size: 14.4px;
@@ -107,16 +94,6 @@ footer .footer-social img {
   height: 30px;
 }
 
-/* Legal links (last list in last nav column — separator + links) */
-footer .footer-nav-col:last-child ul li:first-child {
-  font-size: 14.4px;
-  font-weight: 700;
-}
-
-footer .footer-nav-col:last-child ul li:first-child a {
-  font-weight: 700;
-}
-
 /* Copyright */
 footer .footer-copyright {
   text-align: center;
@@ -124,17 +101,18 @@ footer .footer-copyright {
   color: var(--color-black);
   line-height: 1.4;
   font-family: Gene-Sans-Regular, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.02em;
 }
 
-/* Tablet+: 4 columns — logo | nav | nav | nav */
+/* ── Tablet: 768px+ ── */
+/* Logo left, nav in 3 CSS columns beside it */
 @media (width >= 768px) {
   footer .footer > div {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: 24px;
-    row-gap: 32px;
+    grid-template-columns: auto 1fr;
+    column-gap: 32px;
+    row-gap: 0;
     align-items: start;
   }
 
@@ -145,55 +123,47 @@ footer .footer-copyright {
   }
 
   footer .footer-nav {
-    grid-column: 2 / span 3;
+    grid-column: 2;
     grid-row: 1;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 24px;
-    padding-bottom: 32px;
-    flex-direction: unset;
+    column-count: 3;
+    column-gap: 15px;
+    padding-bottom: 0;
+    padding-top: 0;
   }
 
-  /* At 768+ the 4th nav column (Now Hiring) tucks under the 3rd column */
-  footer .footer-nav-column:nth-child(4) {
-    grid-column: 3;
-  }
-
-  footer .footer-nav-column {
-    gap: 28px;
+  footer .footer-nav ul {
+    margin-bottom: 16px;
   }
 
   footer .footer-social {
     grid-column: 1 / -1;
-    flex-direction: row;
     display: flex;
-    width: 100%;
     justify-content: center;
-    height: 30px;
     align-items: center;
-    gap:20px;
-    padding:0;
+    gap: 20px;
+    height: 54px;
+    padding: 24px 0 0;
+  }
+
+  footer .footer-social p {
+    display: contents;
   }
 
   footer .footer-copyright {
     grid-column: 1 / -1;
+    padding-top: 16px;
+    padding-bottom: 8px;
   }
 }
 
-/* Desktop+: 5 columns — logo | 4 nav columns */
+/* ── Desktop: 1024px+ ── */
+/* Nav expands to 4 CSS columns */
 @media (width >= 1024px) {
   footer .footer > div {
     padding: var(--footer-padding-desktop);
-    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   footer .footer-nav {
-    grid-column: 2 / span 4;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  /* Reset: all 4 nav columns flow naturally at 1024+ */
-  footer .footer-nav-column:nth-child(4) {
-    grid-column: auto;
+    column-count: 4;
   }
 }
