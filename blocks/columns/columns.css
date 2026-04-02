@@ -72,8 +72,8 @@
     padding: 10px 32px;
     border-radius: 50px;
     text-decoration: none;
-    background-color: rgb(48, 55, 61);
-    color: rgb(255, 255, 255);
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
     line-height: 1.8125;
   }
 
@@ -105,12 +105,9 @@
 
   .columns > div {
     gap: 64px;
-        flex-direction: row;
-        padding-left: 25px;
-        padding-right: 25px;
-        padding-top: 34px;
-        padding-bottom: 55px;
-        max-width: 1030px;
+    flex-direction: row;
+    padding: 34px 25px 55px;
+    max-width: 1030px;
   }
 
   .columns > div > .columns-img-col img {

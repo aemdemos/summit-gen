@@ -1,7 +1,9 @@
 /* cards design tokens — Genentech story tiles */
 :root {
   --cards-grid-min-width: 250px;
+  
   /* Cap row width so four tiles match gene.com and stay centered in the section */
+
   --cards-grid-max-width: 1105px;
   --cards-grid-gap: 16px;
   --cards-card-border-width: 0;
