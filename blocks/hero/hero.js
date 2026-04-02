@@ -1,5 +1,7 @@
 /**
- * Hero block — supports default (image-fill text) and video variants.
+ * Hero block — supports:
+ *   - Default: image-fill text (background-clip: text + scroll parallax)
+ *   - Video variant: background video with text overlay
  * @param {Element} block The hero block element
  */
 export default function decorate(block) {
@@ -33,14 +35,41 @@ export default function decorate(block) {
   const h1 = block.querySelector('h1');
 
   if (img && h1) {
-    // Use the image as background-image for the text-clip effect
-    h1.style.backgroundImage = `url('${img.currentSrc || img.src}')`;
+    // Use the illustration image as background for the text-clip effect
+    const imgSrc = img.currentSrc || img.src;
+    h1.style.backgroundImage = `url('${imgSrc}')`;
+
+    // When the high-res image loads via <picture> srcset, update the background
+    img.addEventListener('load', () => {
+      const newSrc = img.currentSrc || img.src;
+      if (newSrc !== imgSrc) {
+        h1.style.backgroundImage = `url('${newSrc}')`;
+      }
+    });
+
+    // Scroll-based parallax: shift the background-position as user scrolls
+    // This moves the illustration through the text mask
+    const onScroll = () => {
+      const rect = block.getBoundingClientRect();
+      const scrollProgress = -rect.top / (rect.height || 1);
+      // Shift background horizontally by up to 30% as user scrolls past
+      const shift = Math.max(0, Math.min(1, scrollProgress)) * 30;
+      h1.style.backgroundPosition = `${shift}% center`;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
-  // Label rows
+  // Label rows — if a row has both picture and h1, it's a combined row
   rows.forEach((row) => {
     const pic = row.querySelector('picture');
-    if (pic) {
+    const heading = row.querySelector('h1');
+    if (pic && heading) {
+      // Combined row: hide picture, show text
+      pic.style.display = 'none';
+      row.classList.add('hero-text');
+    } else if (pic) {
       row.classList.add('hero-media');
     } else {
       row.classList.add('hero-text');
