@@ -1,38 +1,6 @@
 import { getMetadata, decorateIcons } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-const SOCIAL_LINKS = [
-  { href: 'https://facebook.com/genentech', icon: 'facebook' },
-  { href: 'https://twitter.com/genentech', icon: 'twitter' },
-  { href: 'https://linkedin.com/company/genentech', icon: 'linkedin' },
-  { href: 'https://youtube.com/genentech', icon: 'youtube' },
-  { href: 'https://pinterest.com/genentech', icon: 'pinterest' },
-  { href: 'https://www.glassdoor.com/Overview/Working-at-Genentech-EI_IE274.11,20.htm', icon: 'glassdoor' },
-  { href: 'https://instagram.com/genentech', icon: 'instagram' },
-];
-
-function buildLogo() {
-  const div = document.createElement('div');
-  div.className = 'footer-logo';
-  div.innerHTML = '<p><a href="/"><span class="icon icon-genentech-footer-logo"></span></a></p>';
-  return div;
-}
-
-function buildSocial() {
-  const div = document.createElement('div');
-  div.className = 'footer-social';
-  const p = document.createElement('p');
-  SOCIAL_LINKS.forEach(({ href, icon }) => {
-    const a = document.createElement('a');
-    a.href = href;
-    a.setAttribute('aria-label', icon);
-    a.innerHTML = `<span class="icon icon-${icon}"></span>`;
-    p.append(a);
-  });
-  div.append(p);
-  return div;
-}
-
 function buildNav(section) {
   const navEl = document.createElement('nav');
   navEl.className = 'footer-nav';
@@ -70,8 +38,7 @@ function extractContent(section) {
 
 /**
  * Loads and decorates the Genentech footer.
- * DA content has 3 sections: nav | legal | copyright
- * Code adds logo and social icons (icon SVGs live in the repo, not DA).
+ * Fragment sections (authored in DA): logo | nav | social | legal | copyright
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
@@ -85,49 +52,40 @@ export default async function decorate(block) {
   const footer = document.createElement('div');
   const sections = [...fragment.children];
 
-  // Detect section layout by checking if first section has nav lists or is a logo
-  const firstHasLists = sections[0]?.querySelector('ul');
-  let navIdx;
+  // Walk through sections and classify each by its content
+  const classNames = [];
+  sections.forEach((section) => {
+    const hasLists = section.querySelector('ul');
+    const hasSocialLinks = section.querySelector('a[href*="facebook"], a[href*="twitter"], a[href*="linkedin"]');
+    const hasOnlyParagraph = !hasLists && !hasSocialLinks
+      && section.querySelector('p') && !section.querySelector('a[href*="/"]');
 
-  if (firstHasLists) {
-    // No logo section from DA — build from code
-    footer.append(buildLogo());
-    navIdx = 0;
-  } else {
-    // First section is the logo (image or icon link from DA)
-    const logo = extractContent(sections[0]);
-    logo.className = 'footer-logo';
-    footer.append(logo);
-    navIdx = 1;
-  }
+    if (hasLists && !hasSocialLinks) {
+      // Check if this is nav (many lists) or legal (single list with few items)
+      const listItems = section.querySelectorAll('li');
+      if (listItems.length > 10) {
+        classNames.push('nav');
+      } else {
+        classNames.push('legal');
+      }
+    } else if (hasSocialLinks) {
+      classNames.push('social');
+    } else if (hasOnlyParagraph) {
+      classNames.push('copyright');
+    } else {
+      classNames.push('logo');
+    }
+  });
 
-  // Nav section (contains all the <ul> lists)
-  footer.append(buildNav(sections[navIdx]));
-
-  // Social section — check if next section has social links, otherwise build from code
-  const socialIdx = navIdx + 1;
-  const socialSection = sections[socialIdx];
-  const hasSocialLinks = socialSection?.querySelector('a[href*="facebook"], a[href*="twitter"], a[href*="linkedin"]');
-  if (hasSocialLinks) {
-    const social = extractContent(socialSection);
-    social.className = 'footer-social';
-    footer.append(social);
-  } else {
-    footer.append(buildSocial());
-  }
-
-  // Remaining sections: legal then copyright
-  const legalIdx = hasSocialLinks ? socialIdx + 1 : socialIdx;
-  if (sections[legalIdx]) {
-    const legal = extractContent(sections[legalIdx]);
-    legal.className = 'footer-legal';
-    footer.append(legal);
-  }
-  if (sections[legalIdx + 1]) {
-    const copy = extractContent(sections[legalIdx + 1]);
-    copy.className = 'footer-copyright';
-    footer.append(copy);
-  }
+  classNames.forEach((cls, i) => {
+    if (cls === 'nav') {
+      footer.append(buildNav(sections[i]));
+    } else {
+      const div = extractContent(sections[i]);
+      div.className = `footer-${cls}`;
+      footer.append(div);
+    }
+  });
 
   block.append(footer);
   await decorateIcons(footer);
