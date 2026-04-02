@@ -110,6 +110,7 @@
         padding-right: 25px;
         padding-top: 34px;
         padding-bottom: 55px;
+        max-width: 1030px;
   }
 
   .columns > div > .columns-img-col img {
