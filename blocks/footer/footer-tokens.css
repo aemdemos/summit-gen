@@ -1,7 +1,7 @@
 /* footer design tokens */
 :root {
   --footer-max-width: var(--max-width-site);
-  --footer-padding: 40px 34px 28px;
+  --footer-padding: 40px 2em 28px;
   --footer-padding-desktop: 40px 45px 28px;
   --footer-bg: var(--color-warm-gray);
 }
