@@ -333,6 +333,11 @@ main > .section:first-of-type {
   }
 }
 
+/* Section metadata: columns/cards container — edge-to-edge (no side padding on inner wrapper) */
+main > .section:is(.columns-container, .cards-container) > div {
+  padding-inline: 0;
+}
+
 /* section metadata variants */
 main .section.light,
 main .section.highlight {

@@ -31,10 +31,14 @@
   margin: 0 0 var(--spacing-m);
 }
 
+/* @font-face family is "gene-sans"; Regular is weight 400 */
 .columns > div > div:not(.columns-img-col) p {
+  font-family: gene-sans, gene-sans-fallback, sans-serif;
+  font-weight: 400;
   font-size: var(--body-font-size-l);
-  line-height: 1.56;
+  line-height: 1.8125;
   color: var(--color-black);
+  -webkit-font-smoothing: antialiased;
 }
 
 /* White pill CTA button in columns */
@@ -51,8 +55,26 @@
 @media (width >= 900px) {
   .columns > div {
     align-items: center;
-    flex-direction: unset;
-    gap: var(--columns-gap-desktop);
+    display: flex;
+    gap: 32px;
+    margin: 0 auto;
+    max-width: 1140px;
+    position: relative;
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  main > .section .columns {
+    padding: 0;
+  }
+
+  main > .section.columns-container .columns a.button {
+    padding: 10px 32px;
+    border-radius: 50px;
+    text-decoration: none;
+    background-color: rgb(48, 55, 61);
+    color: rgb(255, 255, 255);
+    line-height: 1.8125;
   }
 
   .columns > div > div {
@@ -62,5 +84,35 @@
 
   .columns > div > div:not(.columns-img-col) {
     padding: var(--spacing-xxl) var(--spacing-xl);
+  }
+}
+
+@media (width >= 1023px) {
+  /* @font-face uses family "gene-condensed"; Bold is weight 700, not a separate family name */
+  main > .section.columns-container .columns h2 {
+    font-family: gene-condensed, gene-condensed-fallback, sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 2.6rem;
+    margin-top: 0;
+    margin-bottom: 27px;
+  }
+
+  .columns > div > div:not(.columns-img-col) p {
+    font-size: 17px;
+    margin: 7px 25px 0 0;
+  }
+
+  .columns > div {
+    gap: 64px;
+        flex-direction: row;
+        padding-left: 25px;
+        padding-right: 25px;
+        padding-top: 34px;
+        padding-bottom: 64px;
+  }
+
+  .columns > div > .columns-img-col img {
+    border-radius: 20px;
   }
 }
