@@ -28,32 +28,29 @@
   display: none;
 }
 
-/* Heading with image-fill text-clip effect */
+/* Heading with image-fill text-clip effect:
+   Left portion shows illustration, right portion is solid black.
+   JS sets the full composite background property at runtime. */
 .hero h1 {
-  font-family: var(--display-font-family);
-  font-size: clamp(48px, 10vw, 140px);
-  font-weight: 400;
-  line-height: 1.1;
+  font-family: Gene-Condensed-Bold, var(--display-font-family);
+  font-size: clamp(60px, 12vw, 180px);
+  font-weight: 700;
+  line-height: 1;
   text-align: center;
   margin: 0;
   color: transparent;
-  background-size: cover;
-  background-position: center;
-  /* stylelint-disable-next-line property-no-vendor-prefix -- needed for Safari */
-  -webkit-background-clip: text;
-  background-clip: text;
   -webkit-text-fill-color: transparent; /* stylelint-disable-line property-no-vendor-prefix */
   max-width: 100%;
 }
 
 /* Tagline below the wordmark */
 .hero .hero-text p {
-  font-family: var(--display-font-family);
-  font-size: clamp(14px, 2.5vw, 28px);
+  font-family: Gene-Serif-Regular, Georgia, serif;
+  font-size: clamp(18px, 3vw, 36px);
   font-weight: 400;
   color: var(--color-black);
   text-align: center;
-  margin: 0.3em 0 0;
+  margin: 0.2em 0 0;
   line-height: 1.3;
 }
 

@@ -35,30 +35,34 @@ export default function decorate(block) {
   const h1 = block.querySelector('h1');
 
   if (img && h1) {
-    // Use the illustration image as background for the text-clip effect
-    const imgSrc = img.currentSrc || img.src;
-    h1.style.backgroundImage = `url('${imgSrc}')`;
+    const applyBg = (src, posX) => {
+      // Composite background: illustration left + solid black right
+      h1.style.background = `linear-gradient(to right, transparent 0%, transparent 50%, #000 50%, #000 100%), url('${src}') ${posX}% center / 50% auto no-repeat`;
+      h1.style.webkitBackgroundClip = 'text';
+      h1.style.backgroundClip = 'text';
+    };
 
-    // When the high-res image loads via <picture> srcset, update the background
+    let currentSrc = img.currentSrc || img.src;
+    applyBg(currentSrc, 0);
+
+    // When the high-res image loads via <picture> srcset, update
     img.addEventListener('load', () => {
       const newSrc = img.currentSrc || img.src;
-      if (newSrc !== imgSrc) {
-        h1.style.backgroundImage = `url('${newSrc}')`;
+      if (newSrc !== currentSrc) {
+        currentSrc = newSrc;
+        applyBg(currentSrc, 0);
       }
     });
 
-    // Scroll-based parallax: shift the background-position as user scrolls
-    // This moves the illustration through the text mask
+    // Scroll-based parallax: shift the illustration through the text
     const onScroll = () => {
       const rect = block.getBoundingClientRect();
       const scrollProgress = -rect.top / (rect.height || 1);
-      // Shift background horizontally by up to 30% as user scrolls past
-      const shift = Math.max(0, Math.min(1, scrollProgress)) * 30;
-      h1.style.backgroundPosition = `${shift}% center`;
+      const shift = Math.max(0, Math.min(1, scrollProgress)) * 40;
+      applyBg(currentSrc, shift);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
   }
 
   // Label rows — if a row has both picture and h1, it's a combined row
@@ -66,7 +70,6 @@ export default function decorate(block) {
     const pic = row.querySelector('picture');
     const heading = row.querySelector('h1');
     if (pic && heading) {
-      // Combined row: hide picture, show text
       pic.style.display = 'none';
       row.classList.add('hero-text');
     } else if (pic) {
