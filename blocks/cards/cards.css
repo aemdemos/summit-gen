@@ -109,27 +109,91 @@ main > .section.cards-container .cards {
   }
 }
 
-@media (width >= 1023px) {
- .cards .cards-card-body h4 {
-  font-size: calc(.92rem + .7vw);
-  line-height: 1.17;
-  color: #003087;
-  font-family: gene-condensed, gene-condensed-fallback, sans-serif;
-  font-weight: 700;
-  transition: color .15s;
-  width: 100%;
-  margin-top: 7%;
-  text-align: center;
- }
+/* ── Desktop: 1024px+ — match gene.com tile cards ── */
+@media (width >= 1024px) {
+  .cards > ul {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    max-width: 1105px;
+    margin: 0 auto;
+  }
 
- .cards .cards-card-body{
-  font-size: calc(.65rem + .32vw);
-  line-height: 1.35;
-  color: #505050;
-  font-family: gene-sans, gene-sans-fallback, sans-serif;
-  font-weight: 400;
-  letter-spacing: .01rem;
-  margin: -4px 0;
-  padding: 20px 10px;
- }
+  /* Card tile: white box, equal height, rounded corners, subtle shadow */
+  .cards > ul > li {
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 6%);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 368px;
+  }
+
+  /* Card image: fixed aspect, fill width */
+  .cards > ul > li img {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 0;
+  }
+
+  /* Card body: flex-grow to push content, padding */
+  .cards .cards-card-body {
+    flex: 1;
+    padding: 16px 14px;
+    margin: 0;
+    font-size: 14.4px;
+    line-height: 1.35;
+    color: #505050;
+    font-family: Gene-Sans-Regular, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01rem;
+  }
+
+  /* H4 heading: "Press Release" style — blue, centered, condensed bold */
+  .cards .cards-card-body h4 {
+    font-size: 24px;
+    line-height: 1.17;
+    color: #003087;
+    font-family: Gene-Condensed-Bold, sans-serif;
+    font-weight: 700;
+    text-align: center;
+    margin: 24px 0 0;
+    padding: 0;
+    transition: color 0.15s;
+  }
+
+  /* Horizontal rule after the centered H4 heading */
+  .cards .cards-card-body h4::after {
+    content: '';
+    display: block;
+    width: 60%;
+    height: 2px;
+    background: #30373d;
+    margin: 16px auto;
+  }
+
+  /* Press Release card: center text when no image */
+  .cards > ul > li:first-child .cards-card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Title: bold dark */
+  .cards .cards-card-body p:first-of-type {
+    font-size: 16px;
+    font-weight: 700;
+    color: #30373d;
+    line-height: 1.3;
+  }
+
+  /* Description: lighter gray */
+  .cards .cards-card-body p:nth-of-type(2) {
+    font-size: 14.4px;
+    color: #505050;
+    line-height: 1.35;
+    margin: 6px 0 0;
+  }
 }
