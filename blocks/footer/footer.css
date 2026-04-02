@@ -164,10 +164,11 @@ footer .footer-copyright {
 }
 
 /* ── Desktop: 1024px+ ── */
-/* Nav expands to 4 CSS columns */
+/* Nav stays at 4 CSS columns; logo + 4 nav cols = 5 visual columns */
 @media (width >= 1024px) {
   footer .footer > div {
     padding: var(--footer-padding-desktop);
+    grid-template-columns: 200px 1fr;
   }
 
   footer .footer-nav {
