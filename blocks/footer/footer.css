@@ -40,11 +40,16 @@ footer .footer-nav {
   font-size: .85em;
 }
 
+footer .footer-nav-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 footer .footer-nav ul {
   list-style: none;
   padding: 0;
-  margin: 0 0 20px;
-  break-inside: avoid;
+  margin: 0;
 }
 
 footer .footer-nav li {
@@ -130,17 +135,22 @@ footer .footer-copyright {
   footer .footer-nav {
     grid-column: 2;
     grid-row: 1;
-    column-count: 3;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     column-gap: 15px;
+    row-gap: 0;
     padding-bottom: 0;
     padding-top: 0;
     margin-bottom: 40px;
   }
 
-  footer .footer-nav ul {
-    margin-bottom: 16px;
-    line-height: 1;
-    margin: 0 0 1.75em;
+  /* At 768+ the 4th nav column tucks under column 3 */
+  footer .footer-nav-column:nth-child(4) {
+    grid-column: 3;
+  }
+
+  footer .footer-nav-column {
+    gap: 24px;
   }
 
   footer .footer-social {
@@ -164,7 +174,7 @@ footer .footer-copyright {
 }
 
 /* ── Desktop: 1024px+ ── */
-/* Nav stays at 4 CSS columns; logo + 4 nav cols = 5 visual columns */
+/* Nav expands to 4 grid columns; logo + 4 nav cols = 5 visual columns */
 @media (width >= 1024px) {
   footer .footer > div {
     padding: var(--footer-padding-desktop);
@@ -172,6 +182,11 @@ footer .footer-copyright {
   }
 
   footer .footer-nav {
-    column-count: 4;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Reset: 4th column flows naturally at 1024+ */
+  footer .footer-nav-column:nth-child(4) {
+    grid-column: auto;
   }
 }

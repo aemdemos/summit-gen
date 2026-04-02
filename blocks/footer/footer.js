@@ -6,24 +6,40 @@ function buildNav(navSection, legalSection) {
   navEl.className = 'footer-nav';
   navEl.setAttribute('aria-label', 'Footer navigation');
 
-  // Clone all nav ULs
-  navSection.querySelectorAll('ul').forEach((ul) => navEl.append(ul.cloneNode(true)));
+  // Collect all nav ULs
+  const lists = [...navSection.querySelectorAll('ul')].map((ul) => ul.cloneNode(true));
 
-  // Merge legal links as the last UL in the nav (under Now Hiring column)
+  // Merge legal links as the last UL (under Now Hiring)
   if (legalSection) {
     const legalUl = legalSection.querySelector('ul');
     if (legalUl) {
       const clone = legalUl.cloneNode(true);
-      // Add separator dash as first item if not already present
       const firstLi = clone.querySelector('li');
       if (firstLi && firstLi.textContent.trim() !== '—') {
         const sep = document.createElement('li');
         sep.textContent = '—';
         clone.prepend(sep);
       }
-      navEl.append(clone);
+      lists.push(clone);
     }
   }
+
+  // Group lists into 4 explicit columns: [2, 3, 4, 2]
+  // Col 1: For Patients, About Us
+  // Col 2: Contact Us, For Medical Professionals, For Partners
+  // Col 3: For Scientists, For Media, For Good, Inclusion & Belonging
+  // Col 4: Now Hiring, legal links
+  const colSizes = [2, 3, 4, 2];
+  let idx = 0;
+  colSizes.forEach((size) => {
+    const col = document.createElement('div');
+    col.className = 'footer-nav-column';
+    for (let j = 0; j < size && idx < lists.length; j += 1) {
+      col.append(lists[idx]);
+      idx += 1;
+    }
+    navEl.append(col);
+  });
 
   return navEl;
 }
