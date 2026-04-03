@@ -49,85 +49,136 @@
   padding: 37vh 24px 0;
 }
 
-/* Content wrapper — constrains wordmark + tagline, above mask layers */
-.hero .hero-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 97%;
-  max-width: 1033px;
+/*
+ * gene.com gene-animation (StoryApp-URji_XlK.css), scoped under .hero.
+ * DOM + mask math: StoryApp M0 (HomepageTakeover only composes the page).
+ */
+.hero.gene-animation {
+  padding: 0;
+  display: block;
 }
 
-/*
- * SVG wordmark.
- * Two layers: solid black <text> base, then <image clip-path="…"> illustration overlay.
- * hero.js slides the image's x attribute from off-left to its resting position on load.
- */
-.hero .hero-wordmark {
+.hero .gene-animation-timeline {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 100dvh;
   width: 100%;
-  max-width: 1033px;
+}
+
+.hero .gene-animation-mask-container {
+  position: relative;
+  height: 100%;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Full-viewport illustration layers — mask-size / mask-position driven in JS (`T`, `z`) */
+.hero.gene-animation .gene-mask,
+.hero.gene-animation .g-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  height: 100lvh;
+  width: 100%;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translateZ(0);
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.hero.gene-animation .gene-mask {
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-image: url('/icons/gene-mask.svg');
+  mask-image: url('/icons/gene-mask.svg');
+}
+
+.hero.gene-animation .g-mask {
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-image: url('/icons/g-mask.svg');
+  mask-image: url('/icons/g-mask.svg');
+  opacity: 0;
+}
+
+.hero .gene-animation-flex-center {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+}
+
+.hero .wordmark-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.hero .mask-background {
+  flex-grow: 1;
+  position: relative;
+  z-index: 0;
+}
+
+.hero .wordmark-container {
+  display: flex;
+  flex-flow: column nowrap;
+  position: relative;
+  z-index: 1;
+  max-width: 73.8%;
+  width: 100%;
+  transform: translateZ(0);
+}
+
+.hero .wordmark {
+  display: flex;
+  flex-flow: row nowrap;
+  flex-shrink: 0;
+  width: 100%;
+  transform: translateZ(0);
+  transform-origin: left center;
+}
+
+.hero .wordmark svg {
+  width: 100%;
   height: auto;
   display: block;
 }
 
-/* Tagline — initially hidden; JS entrance animation fades it in */
-.hero .hero-tagline {
+.hero .tagline-wrapper {
+  width: 100%;
+}
+
+.hero .tagline-container {
+  flex-shrink: 1;
+  position: relative;
+  width: 100%;
+}
+
+/* Tagline — entrance fade in hero.js */
+.hero .gene-animation-tagline {
   font-family: gene-serif, gene-serif-fallback, Georgia, serif;
   font-size: clamp(20px, 5vw, 46px);
   font-weight: 400;
   color: var(--color-black);
   text-align: center;
-  margin:0;
+  margin: 0;
   line-height: 1.35;
-  opacity: 0; /* JS entrance animation fades this to 1 */
 }
 
-/*
- * Gene-mask layer: full-hero div with the illustration as background,
- * masked by gene-mask.svg. The illustration shows through the letter cutouts.
- * JS sets background-image, mask-size, and mask-position inline.
- */
-.hero .hero-gene-mask {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-warm-gray);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-image: url('/icons/gene-mask.svg');
-  mask-image: url('/icons/gene-mask.svg');
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  transform-origin: left center;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/*
- * G-zoom layer: same technique but with g-mask.svg (just the "G").
- * Starts invisible; scroll animation fades in and grows the mask.
- */
-.hero .hero-g-zoom {
-  position: absolute;
-  inset: 0;
-  background-color: var(--color-warm-gray);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-image: url('/icons/g-mask.svg');
-  mask-image: url('/icons/g-mask.svg');
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  transform-origin: left center;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
+.hero .hero-fallback-wordmark {
+  font-family: gene-condensed, 'Arial Black', sans-serif;
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 700;
+  color: var(--color-black);
+  margin: 0;
 }
 
 /* === Video variant === */
@@ -203,13 +254,13 @@
 
 /* === Responsive === */
 @media (width >= 768px) {
-  .hero {
+  .hero:not(.gene-animation) {
     padding: 37vh 40px 0;
   }
 }
 
 @media (width >= 1024px) {
-  .hero {
+  .hero:not(.gene-animation) {
     min-height: var(--hero-min-height-desktop);
     padding: 26vh 0 0;
   }
