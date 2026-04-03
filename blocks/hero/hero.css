@@ -33,7 +33,7 @@
    JS sets the full composite background property at runtime. */
 .hero h1 {
   font-family: Gene-Condensed-Bold, var(--display-font-family);
-  font-size: clamp(60px, 12vw, 180px);
+  font-size: clamp(80px, 15vw, 220px);
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -46,7 +46,7 @@
 /* Tagline below the wordmark */
 .hero .hero-text p {
   font-family: Gene-Serif-Regular, Georgia, serif;
-  font-size: clamp(18px, 3vw, 36px);
+  font-size: clamp(22px, 4vw, 50px);
   font-weight: 400;
   color: var(--color-black);
   text-align: center;
@@ -137,6 +137,6 @@
   }
 
   .hero h1 {
-    font-size: clamp(100px, 8vw, 180px);
+    font-size: clamp(140px, 12vw, 220px);
   }
 }
