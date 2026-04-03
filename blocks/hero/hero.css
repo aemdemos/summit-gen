@@ -17,10 +17,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: var(--color-warm-gray);
   overflow: hidden;
-  padding: var(--spacing-xl) var(--spacing-s);
+  padding: 35vh var(--spacing-s) 0;
 }
 
 /* Hide the picture (used as text background-image instead) */
