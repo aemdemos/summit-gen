@@ -119,86 +119,48 @@ function playEntrance(imgEl, taglineEl, durationMs) {
 }
 
 /**
- * Render "G" glyph to an off-screen canvas using the loaded gene-condensed
- * font, then return a PNG data URL for use as CSS mask-image.
- * Returns null if canvas is unavailable.
+ * Wire up scroll-driven two-phase animation:
+ *
+ * Phase 1 (raw 0 → T): tagline fades out; wordmark unchanged.
+ * Phase 2 (raw T → 1): wordmark slides right and scales up from the left edge,
+ *   matching gene.com's observed values:
+ *     start  → translateX(0px)       scale(1)
+ *     end    → translateX(226.968px) scale(2.90526)
+ *   with a p^1.2 ease-in curve that reproduces the slow-start acceleration.
+ *
+ * @param {HTMLElement} scrollPin        tall wrapper div (height = --hero-scroll-height)
+ * @param {HTMLElement|null} tagline     tagline element — fades out in phase 1
+ * @param {HTMLElement|null} heroContent wordmark container — slides/scales in phase 2
  */
-function buildGMaskUrl() {
-  try {
-    const canvas = document.createElement('canvas');
-    const res = 512;
-    canvas.width = res;
-    canvas.height = res;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-    ctx.fillStyle = 'white';
-    ctx.font = `700 ${Math.round(res * 0.88)}px gene-condensed, 'Arial Black', sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.fillText('G', res * 0.5, res * 0.88);
-    return canvas.toDataURL('image/png');
-  } catch {
-    return null;
-  }
-}
+function initScrollAnim(scrollPin, tagline, heroContent) {
+  const wordmark = heroContent ? heroContent.querySelector('svg') : null;
 
-/**
- * Wire up scroll-driven G-zoom animation.
- *
- * Mask-size grows exponentially with a quadratic ease-in (slow start →
- * explosive finish) matching the gene.com animation curve extracted from
- * its computed style data.
- *
- * Anchor formula keeps the G's visual center fixed at (50 % vw, 52 % vh)
- * so the letter appears to expand outward from the viewport center.
- *
- * @param {HTMLElement} scrollPin    tall wrapper div (height = --hero-scroll-height)
- * @param {HTMLElement} gZoom        illustration panel with G mask
- * @param {HTMLElement|null} tagline tagline element to fade out in sync
- */
-function initGZoom(scrollPin, gZoom, tagline) {
-  const maskUrl = buildGMaskUrl();
-  if (!maskUrl) return; // canvas unsupported — skip G-zoom gracefully
-
-  // Apply G mask (webkit prefix for Safari)
-  gZoom.style.webkitMaskImage = `url('${maskUrl}')`;
-  gZoom.style.maskImage = `url('${maskUrl}')`;
-  gZoom.style.webkitMaskRepeat = 'no-repeat';
-  gZoom.style.maskRepeat = 'no-repeat';
+  // raw value at which phase 1 ends and phase 2 begins (tagline fully gone)
+  const T = 0.10;
 
   function update() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
     const rect = scrollPin.getBoundingClientRect();
-    const scrollable = scrollPin.offsetHeight - vh;
+    const scrollable = scrollPin.offsetHeight - window.innerHeight;
     const raw = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 1;
 
-    // G-zoom fades IN over the first 10 % of scroll; tagline fades OUT in sync.
-    const fadeProgress = Math.min(1, raw * 10);
-    gZoom.style.opacity = String(fadeProgress);
-    if (tagline) tagline.style.opacity = String(1 - fadeProgress);
+    // Phase 1: tagline fades from 1 → 0
+    if (tagline) tagline.style.opacity = String(Math.max(0, 1 - raw / T));
 
-    if (raw <= 0) return;
+    if (raw < T) {
+      if (wordmark) wordmark.style.transform = '';
+      return;
+    }
 
-    // Exponential growth: minSize (0.34× vw) → maxSize (17× vw)
-    // Exponent uses quadratic ease-in (t²) — slow start, explosive finish —
-    // matching gene.com's observed mask-size progression.
-    const minSize = vw * 0.34;
-    const maxSize = vw * 17;
-    const maskSize = minSize * (maxSize / minSize) ** (raw * raw);
-
-    // G visual center in the 512×512 canvas sits at roughly (50 %, 57 %)
-    // of the canvas dimensions. Anchor the mask so that point stays at
-    // (50 % vw, 52 % vh) on screen.
-    const posX = vw * 0.50 - maskSize * 0.50;
-    const posY = vh * 0.52 - maskSize * 0.57;
-
-    const sizePx = `${maskSize}px ${maskSize}px`;
-    const posPx = `${posX}px ${posY}px`;
-    gZoom.style.webkitMaskSize = sizePx;
-    gZoom.style.maskSize = sizePx;
-    gZoom.style.webkitMaskPosition = posPx;
-    gZoom.style.maskPosition = posPx;
+    // Phase 2: wordmark zooms in and slides right.
+    // p^1.2 ease-in: slow start that accelerates — matches gene.com's observed curve.
+    const p = (raw - T) / (1 - T);
+    const ease = p ** 1.2;
+    if (wordmark) {
+      const tx = ease * 226.968; // 0 → 226.968 px
+      const sc = 1 + ease * 1.90526; // 1.0 → 2.90526
+      wordmark.style.transformOrigin = 'left center';
+      wordmark.style.transform = `translateX(${tx}px) scale(${sc})`;
+    }
   }
 
   let ticking = false;
@@ -246,19 +208,6 @@ export default async function decorate(block) {
   const wordmarkText = h1.textContent.trim();
   const imgSrc = img.src; // resolved absolute URL (750 px version)
 
-  // Get the highest-resolution desktop source for the G-zoom background
-  let hiResSrc = imgSrc;
-  const desktopSrc = block.querySelector('picture source[media*="600px"]');
-  if (desktopSrc) {
-    const srcset = desktopSrc.getAttribute('srcset');
-    const entry = srcset?.split(',')[0]?.trim()?.split(' ')[0];
-    if (entry) {
-      const resolver = document.createElement('a');
-      resolver.href = entry;
-      hiResSrc = resolver.href;
-    }
-  }
-
   // Find tagline: first <p> after h1 with no embedded media
   let taglineText = '';
   let sibling = h1.nextElementSibling;
@@ -295,12 +244,6 @@ export default async function decorate(block) {
   }
   block.append(heroContent);
 
-  // Layer 2: G-zoom illustration panel (sits on top via DOM order)
-  const gZoom = document.createElement('div');
-  gZoom.className = 'hero-g-zoom';
-  gZoom.style.backgroundImage = `url('${hiResSrc}')`;
-  block.append(gZoom);
-
   // ── Scroll-pin setup ───────────────────────────────────────────────────────
   const section = block.closest('.section');
   const scrollPin = document.createElement('div');
@@ -313,5 +256,5 @@ export default async function decorate(block) {
   // Wait for fonts so SVG text metrics and canvas G glyph are correct
   await document.fonts.ready;
   playEntrance(imgEl, taglineEl, 1500);
-  initGZoom(scrollPin, gZoom, taglineEl);
+  initScrollAnim(scrollPin, taglineEl, heroContent);
 }

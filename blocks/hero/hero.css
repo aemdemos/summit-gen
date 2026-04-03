@@ -70,26 +70,6 @@
   display: block;
 }
 
-/*
- * G-zoom illustration panel (Layer 2).
- * Absolutely fills the hero. Background image is set inline by hero.js.
- * Starts invisible (opacity 0); scroll animation fades it in and grows the
- * G-shaped mask-image from a small letter to full-viewport coverage.
- * mask-image / mask-size / mask-position are animated via inline styles.
- */
-.hero .hero-g-zoom {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0;
-  pointer-events: none; /* wordmark beneath remains interactive */
-  mask-repeat: no-repeat;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-repeat: no-repeat;
-}
-
 /* Tagline — initially hidden; JS entrance animation fades it in */
 .hero .hero-tagline {
   font-family: gene-serif, gene-serif-fallback, Georgia, serif;
