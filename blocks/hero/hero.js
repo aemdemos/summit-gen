@@ -27,9 +27,9 @@
 // SVG wordmark constants (keep in sync with viewBox in buildSVG)
 const SVG_WIDTH = 2000;
 const SVG_HEIGHT = 450;
-const IMAGE_WIDTH = SVG_WIDTH * 0.48; // illustration covers left ~55 % (≈ "Genen")
+const IMAGE_WIDTH = SVG_WIDTH; // illustration covers full wordmark width
 const IMAGE_X_START = -IMAGE_WIDTH; // off-screen left on load
-const IMAGE_X_END = 0; // rests over left portion of wordmark
+const IMAGE_X_END = 0; // rests covering full wordmark
 
 /** Cubic ease-in-out, t ∈ [0, 1]. */
 function easeInOut(t) {
@@ -69,19 +69,7 @@ function buildSVG(wordmarkText, imgSrc) {
   defs.append(clipPath);
   svg.append(defs);
 
-  // Solid black base
-  const blackText = document.createElementNS(ns, 'text');
-  blackText.setAttribute('x', `${SVG_WIDTH / 2}`);
-  blackText.setAttribute('y', '390');
-  blackText.setAttribute('text-anchor', 'middle');
-  blackText.setAttribute('font-family', 'gene-condensed, Arial Black, sans-serif');
-  blackText.setAttribute('font-size', '420');
-  blackText.setAttribute('font-weight', '700');
-  blackText.setAttribute('fill', 'black');
-  blackText.textContent = wordmarkText;
-  svg.append(blackText);
-
-  // Illustration overlay (starts off-screen left)
+  // Illustration image clipped to text shape (starts off-screen left, slides in)
   const imgEl = document.createElementNS(ns, 'image');
   imgEl.setAttribute('href', imgSrc);
   imgEl.setAttribute('x', `${IMAGE_X_START}`);
@@ -131,67 +119,21 @@ function playEntrance(imgEl, taglineEl, durationMs) {
  * @param {HTMLElement} scrollPin        tall wrapper div (height = --hero-scroll-height)
  * @param {HTMLElement|null} tagline     tagline element — fades out in phase 1
  * @param {HTMLElement|null} heroContent wordmark container — slides/scales in phase 2
- * @param {HTMLElement|null} geneMask    gene-mask layer — crossfades out in phase 2
- * @param {HTMLElement|null} gZoom       g-zoom layer — crossfades in during phase 2
+ * @param {HTMLElement|null} gZoom       g-zoom layer — fades in when G reaches center
  */
-function initScrollAnim(scrollPin, tagline, heroContent, geneMask, gZoom) {
+function initScrollAnim(scrollPin, tagline, heroContent, gZoom) {
   const wordmark = heroContent ? heroContent.querySelector('svg') : null;
-
-  // Position the gene-mask to align with the wordmark SVG
-  function positionMasks() {
-    if (!wordmark || !geneMask) return;
-    const svgRect = wordmark.getBoundingClientRect();
-    const heroRect = wordmark.closest('.hero')?.getBoundingClientRect();
-    if (!heroRect) return;
-
-    // The mask SVG is 1656×465 (just "Gene" portion ~47% of full wordmark width)
-    // Scale mask to match the rendered wordmark height
-    const maskNativeW = 1656;
-    const maskNativeH = 465;
-    const scale = svgRect.height / maskNativeH;
-    const maskW = maskNativeW * scale;
-
-    // Position mask at the left edge of the wordmark, vertically aligned
-    const maskX = svgRect.left - heroRect.left;
-    const maskY = svgRect.top - heroRect.top;
-
-    const maskStyle = `${maskW}px ${svgRect.height}px`;
-    const maskPos = `${maskX}px ${maskY}px`;
-
-    geneMask.style.maskSize = maskStyle;
-    geneMask.style.webkitMaskSize = maskStyle;
-    geneMask.style.maskPosition = maskPos;
-    geneMask.style.webkitMaskPosition = maskPos;
-
-    // G-zoom starts at the same position/size as gene-mask
-    if (gZoom) {
-      gZoom.style.maskSize = maskStyle;
-      gZoom.style.webkitMaskSize = maskStyle;
-      gZoom.style.maskPosition = maskPos;
-      gZoom.style.webkitMaskPosition = maskPos;
-    }
-  }
-
-  positionMasks();
 
   // Scroll thresholds as fraction of total scrollable distance
   const T1 = 0.10; // tagline fully faded by here
   const T2 = 0.25; // gene-mask → g-mask crossfade starts
   const T3 = 0.50; // crossfade complete, g-zoom grows
 
-  function applyCrossfade(raw) {
-    let geneOp = 1;
-    let gOp = 0;
-    if (raw > T3) {
-      geneOp = 0;
-      gOp = 1;
-    } else if (raw >= T2) {
-      const t = (raw - T2) / (T3 - T2);
-      geneOp = 1 - t;
-      gOp = t;
-    }
-    if (geneMask) geneMask.style.opacity = String(geneOp);
-    if (gZoom) gZoom.style.opacity = String(gOp);
+  function applyGZoomFade(raw) {
+    if (!gZoom) return;
+    if (raw > T3) gZoom.style.opacity = '1';
+    else if (raw >= T2) gZoom.style.opacity = String((raw - T2) / (T3 - T2));
+    else gZoom.style.opacity = '0';
   }
 
   function applyWordmarkZoom(ease) {
@@ -228,7 +170,7 @@ function initScrollAnim(scrollPin, tagline, heroContent, geneMask, gZoom) {
     const raw = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 
     if (tagline) tagline.style.opacity = String(Math.max(0, 1 - raw / T1));
-    applyCrossfade(raw);
+    applyGZoomFade(raw);
 
     if (raw < T1) {
       if (wordmark) wordmark.style.transform = '';
@@ -249,7 +191,7 @@ function initScrollAnim(scrollPin, tagline, heroContent, geneMask, gZoom) {
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => { positionMasks(); update(); }, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
   update();
 }
 
@@ -299,13 +241,8 @@ export default async function decorate(block) {
   // ── Build DOM ──────────────────────────────────────────────────────────────
   block.textContent = '';
 
-  // Gene-mask layer: illustration visible through "Gene" letter shapes
-  const geneMaskEl = document.createElement('div');
-  geneMaskEl.className = 'hero-gene-mask';
-  geneMaskEl.style.backgroundImage = `url('${imgSrc}')`;
-  block.append(geneMaskEl);
-
   // G-zoom layer: illustration visible through "G" letter shape (starts hidden)
+  // Fades in when the wordmark's G reaches center-screen during scroll zoom
   const gZoomEl = document.createElement('div');
   gZoomEl.className = 'hero-g-zoom';
   gZoomEl.style.backgroundImage = `url('${imgSrc}')`;
@@ -345,5 +282,5 @@ export default async function decorate(block) {
   // Wait for fonts so SVG text metrics and canvas G glyph are correct
   await document.fonts.ready;
   playEntrance(imgEl, taglineEl, 1500);
-  initScrollAnim(scrollPin, taglineEl, heroContent, geneMaskEl, gZoomEl);
+  initScrollAnim(scrollPin, taglineEl, heroContent, gZoomEl);
 }
