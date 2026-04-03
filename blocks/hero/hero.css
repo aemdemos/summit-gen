@@ -54,7 +54,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 74%;
+  width: 97%;
   max-width: 1033px;
 }
 
@@ -93,11 +93,11 @@
 /* Tagline — initially hidden; JS entrance animation fades it in */
 .hero .hero-tagline {
   font-family: gene-serif, gene-serif-fallback, Georgia, serif;
-  font-size: clamp(20px, 3.5vw, 46px);
+  font-size: clamp(20px, 5vw, 46px);
   font-weight: 400;
   color: var(--color-black);
   text-align: center;
-  margin: 0.3em 0 0;
+  margin:0;
   line-height: 1.35;
   opacity: 0; /* JS entrance animation fades this to 1 */
 }
@@ -183,6 +183,6 @@
 @media (width >= 1024px) {
   .hero {
     min-height: var(--hero-min-height-desktop);
-    padding: 37vh 0 0;
+    padding: 16vh 0 0;
   }
 }
