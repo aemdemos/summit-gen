@@ -183,6 +183,6 @@
 @media (width >= 1024px) {
   .hero {
     min-height: var(--hero-min-height-desktop);
-    padding: 16vh 0 0;
+    padding: 26vh 0 0;
   }
 }
