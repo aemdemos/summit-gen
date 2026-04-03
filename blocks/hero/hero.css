@@ -43,10 +43,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: var(--color-warm-gray);
   overflow: hidden;
-  padding: 0 24px;
+  padding: 37vh 24px 0;
 }
 
 /* Content wrapper — constrains wordmark + tagline */
@@ -54,8 +54,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 1200px;
+  width: 74%;
+  max-width: 1033px;
 }
 
 /*
@@ -65,7 +65,7 @@
  */
 .hero .hero-wordmark {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1033px;
   height: auto;
   display: block;
 }
@@ -176,13 +176,13 @@
 /* === Responsive === */
 @media (width >= 768px) {
   .hero {
-    padding: 0 40px;
+    padding: 37vh 40px 0;
   }
 }
 
 @media (width >= 1024px) {
   .hero {
     min-height: var(--hero-min-height-desktop);
-    padding: 0;
+    padding: 37vh 0 0;
   }
 }
