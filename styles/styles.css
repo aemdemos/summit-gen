@@ -131,7 +131,7 @@ body.appear {
 
 header {
   height: var(--header-height);
-  background-color: var(--color-warm-gray-gradient-start);
+  background-color: var(--color-warm-gray);
 }
 
 header .header,
@@ -207,9 +207,6 @@ pre {
   white-space: pre;
 }
 
-main > div {
-  margin: 40px 16px;
-}
 
 input,
 textarea,

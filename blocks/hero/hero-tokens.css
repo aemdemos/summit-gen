@@ -1,5 +1,8 @@
 /* hero design tokens */
 :root {
-  --hero-min-height: 80vh;
-  --hero-min-height-desktop: 5120.89px;
+  --hero-min-height: 100vh;
+  --hero-min-height-desktop: 100vh;
+
+  /* Total scroll height of the pin wrapper (100vh pinned + 200vh animation scroll) */
+  --hero-scroll-height: 300vh;
 }

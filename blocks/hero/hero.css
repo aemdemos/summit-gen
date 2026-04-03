@@ -1,5 +1,28 @@
 @import url('./hero-tokens.css');
 
+/* === Scroll-pin wrapper === */
+
+/*
+ * Outer wrapper injected by hero.js. Its height provides the scroll distance
+ * during which the hero is pinned and the illustration-slide animation plays.
+ */
+.hero-scroll-pin {
+  position: relative;
+  height: var(--hero-scroll-height, 300vh);
+}
+
+/*
+ * When hero.js adds .hero-pinned, the section sticks to the top of the
+ * viewport for the full scroll distance provided by .hero-scroll-pin.
+ */
+.hero-container.hero-pinned {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
 /* === Hero container & wrapper overrides === */
 .hero-container {
   margin: 0;
@@ -10,20 +33,23 @@
   padding: 0;
 }
 
-/* === Default hero (SVG text mask with illustration) === */
+/* === Default hero === */
 .hero {
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
   min-height: var(--hero-min-height);
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background-color: var(--color-warm-gray);
   overflow: hidden;
-  padding: 30vh 24px 0;
+  padding: 0 24px;
 }
 
-/* Content wrapper */
+/* Content wrapper — constrains wordmark + tagline */
 .hero .hero-content {
   display: flex;
   flex-direction: column;
@@ -32,7 +58,11 @@
   max-width: 1200px;
 }
 
-/* SVG wordmark */
+/*
+ * SVG wordmark.
+ * Two layers: solid black <text> base, then <image clip-path="…"> illustration overlay.
+ * hero.js slides the image's x attribute from off-left to its resting position on load.
+ */
 .hero .hero-wordmark {
   width: 100%;
   max-width: 1100px;
@@ -40,15 +70,36 @@
   display: block;
 }
 
-/* Tagline below the wordmark */
+/*
+ * G-zoom illustration panel (Layer 2).
+ * Absolutely fills the hero. Background image is set inline by hero.js.
+ * Starts invisible (opacity 0); scroll animation fades it in and grows the
+ * G-shaped mask-image from a small letter to full-viewport coverage.
+ * mask-image / mask-size / mask-position are animated via inline styles.
+ */
+.hero .hero-g-zoom {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  pointer-events: none; /* wordmark beneath remains interactive */
+  mask-repeat: no-repeat;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* Tagline — initially hidden; JS entrance animation fades it in */
 .hero .hero-tagline {
-  font-family: Gene-Serif-Regular, Georgia, serif;
-  font-size: clamp(22px, 4vw, 50px);
+  font-family: gene-serif, gene-serif-fallback, Georgia, serif;
+  font-size: clamp(20px, 3.5vw, 46px);
   font-weight: 400;
   color: var(--color-black);
   text-align: center;
-  margin: 0.15em 0 0;
-  line-height: 1.3;
+  margin: 0.3em 0 0;
+  line-height: 1.35;
+  opacity: 0; /* JS entrance animation fades this to 1 */
 }
 
 /* === Video variant === */
@@ -125,14 +176,13 @@
 /* === Responsive === */
 @media (width >= 768px) {
   .hero {
-    min-height: 90vh;
-    padding: 30vh 40px 0;
+    padding: 0 40px;
   }
 }
 
 @media (width >= 1024px) {
   .hero {
     min-height: var(--hero-min-height-desktop);
-    padding: 30vh 60px 0;
+    padding: 0 60px;
   }
 }
