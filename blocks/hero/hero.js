@@ -1,12 +1,10 @@
 /**
  * Hero block — supports:
- *   - Default: image-fill text (background-clip: text + scroll parallax)
+ *   - Default: SVG text mask with illustration image + scroll parallax
  *   - Video variant: background video with text overlay
  * @param {Element} block The hero block element
  */
 export default function decorate(block) {
-  const rows = [...block.children];
-
   // Video variant: convert mp4 link to <video>
   if (block.classList.contains('video')) {
     const link = block.querySelector('a[href$=".mp4"]');
@@ -30,52 +28,109 @@ export default function decorate(block) {
     return;
   }
 
-  // Default variant: image-fill text effect
+  // Default variant: SVG text mask with illustration
   const img = block.querySelector('img');
   const h1 = block.querySelector('h1');
 
-  if (img && h1) {
-    const applyBg = (src, posX) => {
-      // Composite background: illustration left + solid black right
-      h1.style.background = `linear-gradient(to right, transparent 0%, transparent 50%, #000 50%, #000 100%), url('${src}') ${posX}% center / 50% auto no-repeat`;
-      h1.style.webkitBackgroundClip = 'text';
-      h1.style.backgroundClip = 'text';
-    };
+  if (!img || !h1) return;
 
-    let currentSrc = img.currentSrc || img.src;
-    applyBg(currentSrc, 0);
+  const imgSrc = img.currentSrc || img.src;
+  const wordmarkText = h1.textContent.trim();
 
-    // When the high-res image loads via <picture> srcset, update
-    img.addEventListener('load', () => {
-      const newSrc = img.currentSrc || img.src;
-      if (newSrc !== currentSrc) {
-        currentSrc = newSrc;
-        applyBg(currentSrc, 0);
-      }
-    });
-
-    // Scroll-based parallax: shift the illustration through the text
-    const onScroll = () => {
-      const rect = block.getBoundingClientRect();
-      const scrollProgress = -rect.top / (rect.height || 1);
-      const shift = Math.max(0, Math.min(1, scrollProgress)) * 40;
-      applyBg(currentSrc, shift);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
+  // Tagline is the <p> sibling AFTER the h1, not the one containing the picture
+  let taglineText = '';
+  let el = h1.nextElementSibling;
+  while (el) {
+    if (el.tagName === 'P' && !el.querySelector('picture, img')) {
+      taglineText = el.textContent.trim();
+      break;
+    }
+    el = el.nextElementSibling;
   }
 
-  // Label rows — if a row has both picture and h1, it's a combined row
-  rows.forEach((row) => {
-    const pic = row.querySelector('picture');
-    const heading = row.querySelector('h1');
-    if (pic && heading) {
-      pic.style.display = 'none';
-      row.classList.add('hero-text');
-    } else if (pic) {
-      row.classList.add('hero-media');
-    } else {
-      row.classList.add('hero-text');
-    }
+  // Clear the block and rebuild with SVG mask approach
+  block.textContent = '';
+
+  // Create the hero content wrapper
+  const heroContent = document.createElement('div');
+  heroContent.className = 'hero-content';
+
+  // Build SVG with text mask — the illustration shows through the text
+  // eslint-disable-next-line browser-security/no-http-urls, browser-security/detect-mixed-content
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('class', 'hero-wordmark');
+  svg.setAttribute('viewBox', '-50 0 2100 450');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+  // Define clip path using text
+  const defs = document.createElementNS(svgNS, 'defs');
+  const clipPath = document.createElementNS(svgNS, 'clipPath');
+  clipPath.setAttribute('id', 'hero-text-clip');
+
+  const textEl = document.createElementNS(svgNS, 'text');
+  textEl.setAttribute('x', '1000');
+  textEl.setAttribute('y', '320');
+  textEl.setAttribute('text-anchor', 'middle');
+  textEl.setAttribute('font-family', 'Gene-Condensed-Bold, Arial Black, sans-serif');
+  textEl.setAttribute('font-size', '380');
+  textEl.setAttribute('font-weight', '700');
+  textEl.textContent = wordmarkText;
+  clipPath.append(textEl);
+  defs.append(clipPath);
+  svg.append(defs);
+
+  // Black text (full wordmark) — solid black base layer
+  const blackText = document.createElementNS(svgNS, 'text');
+  blackText.setAttribute('x', '1000');
+  blackText.setAttribute('y', '320');
+  blackText.setAttribute('text-anchor', 'middle');
+  blackText.setAttribute('font-family', 'Gene-Condensed-Bold, Arial Black, sans-serif');
+  blackText.setAttribute('font-size', '380');
+  blackText.setAttribute('font-weight', '700');
+  blackText.setAttribute('fill', 'black');
+  blackText.textContent = wordmarkText;
+  svg.append(blackText);
+
+  // Image clipped to text shape — overlays the left ~50% of the text
+  const imgEl = document.createElementNS(svgNS, 'image');
+  imgEl.setAttribute('href', imgSrc);
+  imgEl.setAttribute('x', '0');
+  imgEl.setAttribute('y', '-50');
+  imgEl.setAttribute('width', '1000');
+  imgEl.setAttribute('height', '550');
+  imgEl.setAttribute('preserveAspectRatio', 'xMinYMid slice');
+  imgEl.setAttribute('clip-path', 'url(#hero-text-clip)');
+  imgEl.setAttribute('class', 'hero-mask-image');
+  svg.append(imgEl);
+
+  heroContent.append(svg);
+
+  // Tagline text below
+  if (taglineText) {
+    const tagline = document.createElement('p');
+    tagline.className = 'hero-tagline';
+    tagline.textContent = taglineText;
+    heroContent.append(tagline);
+  }
+
+  block.append(heroContent);
+
+  // Update image src when high-res loads
+  img.addEventListener('load', () => {
+    const newSrc = img.currentSrc || img.src;
+    imgEl.setAttribute('href', newSrc);
   });
+
+  // Scroll-based parallax: shift the mask image position as user scrolls
+  const onScroll = () => {
+    const rect = block.getBoundingClientRect();
+    const scrollProgress = Math.max(0, -rect.top / (rect.height * 0.3));
+    const clamped = Math.min(1, scrollProgress);
+    // Move the image from left (x=0) to right (x=900) as scroll progresses
+    const xShift = clamped * 1000;
+    imgEl.setAttribute('x', `${xShift}`);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
 }
