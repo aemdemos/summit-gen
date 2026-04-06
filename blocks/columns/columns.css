@@ -1,8 +1,10 @@
 @import url('./columns-tokens.css');
 
+/* Scroll-entrance: GPU-accelerated opacity + transform */
 .columns > div {
   display: flex;
   flex-direction: column;
+  will-change: transform, opacity;
 }
 
 .columns img {

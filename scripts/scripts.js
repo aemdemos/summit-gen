@@ -427,6 +427,27 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+
+  // Scroll-driven entrance animation for all main sections below the hero
+  const { initScrollSlideshow, applySlideEntrance } = await import('./scroll-slideshow.js');
+  const sections = [...main.querySelectorAll(':scope > .section')];
+  // Skip the hero section (first) — it has its own scroll animation
+  const slideSections = sections.filter((s) => !s.querySelector('.hero'));
+  if (slideSections.length) {
+    slideSections.forEach((s) => {
+      s.style.opacity = '0';
+      s.style.transform = 'translateY(40px)';
+    });
+    initScrollSlideshow(main, slideSections, {
+      onProgress(idx, progress) {
+        applySlideEntrance(slideSections[idx], progress, {
+          enterStart: 0.05,
+          enterEnd: 0.25,
+          translateY: 40,
+        });
+      },
+    });
+  }
 }
 
 /**
