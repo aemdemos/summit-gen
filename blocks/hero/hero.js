@@ -19,6 +19,10 @@
 const W = 3538;
 /** Fallback gene-mask width when `#Gene` is not measurable (StoryApp `N`). */
 const N = 1655.66;
+/** Left edge of `#ntech` “n” in wordmark user space (`icons/gene-animation-wordmark.svg`). */
+const NTECH_LEFT_REF = 1723.83;
+/** Ignore `getBBox()` when width below this (e.g. `opacity="0"` yields zeros in some engines). */
+const MIN_GENE_BBOX_W = 400;
 /** Scroll helpers (StoryApp). */
 const B_CONST = 218;
 const C_CONST = 56;
@@ -51,16 +55,19 @@ function computeMaskLayout(wordmarkEl, maskLayerEl, svgEl) {
   }
 
   const wordmarkWidth = wordmarkEl.offsetWidth;
+  /* Gene sits on the left of the wordmark SVG; `(W - N) / 2` was wrong and skewed mask vs letters. */
   let geneW = N;
-  let geneX = (W - N) / 2;
+  let geneX = 0;
   const geneG = svgEl && svgEl.querySelector('#Gene');
   if (geneG) {
     try {
       const box = geneG.getBBox();
-      geneW = box.width;
-      geneX = box.x;
+      if (box.width >= MIN_GENE_BBOX_W && Number.isFinite(box.x)) {
+        geneW = box.width;
+        geneX = box.x;
+      }
     } catch {
-      /* keep fallback */
+      /* keep N, 0 */
     }
   }
   const yScale = wordmarkWidth / W;
@@ -127,6 +134,54 @@ function applyMaskFrame(geneMask, gMask, wordmark, state) {
   }
 }
 
+/**
+ * Align solid `#ntech` to masked `#Gene`. `auto` uses bbox when reliable; otherwise art fallbacks.
+ * @param {Element} block `.hero.gene-animation`
+ * @param {SVGGElement|null} ntechGroup `.hero-ntech`
+ * @param {SVGSVGElement|null} svgEl
+ */
+function applyNtechShift(block, ntechGroup, svgEl) {
+  if (!ntechGroup || !svgEl) return;
+  const cs = getComputedStyle(block);
+  const rawShift = cs.getPropertyValue('--hero-ntech-shift-u').trim();
+  const rawKern = cs.getPropertyValue('--hero-ntech-kern-u').trim();
+  const kern = parseFloat(rawKern);
+  const k = Number.isFinite(kern) ? kern : 0;
+
+  ntechGroup.removeAttribute('transform');
+
+  const nb = ntechGroup.getBBox();
+  const ntechLeft = nb.width > 200 && Number.isFinite(nb.x) ? nb.x : NTECH_LEFT_REF;
+
+  let geneRight = N;
+  const gene = svgEl.querySelector('#Gene');
+  if (gene) {
+    try {
+      const gb = gene.getBBox();
+      if (gb.width >= MIN_GENE_BBOX_W && Number.isFinite(gb.x)) {
+        geneRight = gb.x + gb.width;
+      }
+    } catch {
+      /* keep N */
+    }
+  }
+
+  let shift;
+  if (rawShift === 'auto' || rawShift === '') {
+    shift = geneRight - ntechLeft + k;
+  } else {
+    const u = parseFloat(rawShift);
+    shift = Number.isFinite(u) ? u : geneRight - ntechLeft + k;
+  }
+
+  /* Catastrophic bbox bugs produced ~−1700; upper clamp allows positive kern (gap) from CSS. */
+  shift = Math.max(-20, Math.min(120, shift));
+
+  if (shift !== 0) {
+    ntechGroup.setAttribute('transform', `translate(${shift} 0)`);
+  }
+}
+
 function lerp(a, b, u) {
   return a + (b - a) * u;
 }
@@ -176,6 +231,7 @@ function scrollToState(raw, base) {
     taglineOpacity: 1,
     ntechOpacity: 1,
     geneMaskOpacity: 1,
+    /* `.g-mask` only after ntech fades — avoids double mask / ghosting on “Gene” + “ntech”. */
     gMaskOpacity: 0,
   };
 
@@ -188,6 +244,7 @@ function scrollToState(raw, base) {
   if (t < 0.3) {
     const u = (t - 0.1) / 0.2;
     out.ntechOpacity = 1 - u;
+    out.gMaskOpacity = 0;
     return out;
   }
   out.ntechOpacity = 0;
@@ -263,8 +320,9 @@ function playEntrance(taglineWrap, durationMs) {
  * @param {HTMLElement|null} taglineWrap
  * @param {HTMLElement|null} ntechGroup
  * @param {SVGSVGElement|null} svgEl
+ * @param {Element|null} heroBlock `.hero.gene-animation` (ntech shift + CSS tokens)
  */
-function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl) {
+function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl, heroBlock) {
   let base = {
     baseSize: 0,
     baseLeft: 0,
@@ -297,6 +355,7 @@ function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntech
       wmScale: 1,
       wmTx: initialTx,
     });
+    if (heroBlock && ntechGroup) applyNtechShift(heroBlock, ntechGroup, svgEl);
   }
 
   function update() {
@@ -346,6 +405,14 @@ function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntech
     refreshBase();
     update();
   }, { passive: true });
+
+  if (typeof ResizeObserver !== 'undefined' && wordmark) {
+    const ro = new ResizeObserver(() => {
+      refreshBase();
+      update();
+    });
+    ro.observe(wordmark);
+  }
 
   refreshBase();
   update();
@@ -501,5 +568,5 @@ export default async function decorate(block) {
   });
 
   playEntrance(taglineWrap, 1500);
-  initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl);
+  initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl, block);
 }

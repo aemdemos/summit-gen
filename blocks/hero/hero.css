@@ -56,6 +56,13 @@
 .hero.gene-animation {
   padding: 0;
   display: block;
+
+  /*
+   * `auto` = place `#ntech` from `#Gene` bbox (hero.js). Kern is SVG units: higher = more space between Gene and ntech.
+   * Override with a number for `--hero-ntech-shift-u` to set a fixed translate instead of auto.
+   */
+  --hero-ntech-shift-u: auto;
+  --hero-ntech-kern-u: 28;
 }
 
 .hero .gene-animation-timeline {
@@ -118,11 +125,15 @@
 
 .hero .wordmark-wrapper {
   display: flex;
+  flex-flow: row wrap;
+  align-items: flex-end;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .hero .mask-background {
-  flex-grow: 1;
+  flex: 1 1 0;
+  min-width: 0;
   position: relative;
   z-index: 0;
 }
@@ -132,9 +143,15 @@
   flex-flow: column nowrap;
   position: relative;
   z-index: 1;
+  flex: 0 1 73.8%;
   max-width: 73.8%;
   width: 100%;
   transform: translateZ(0);
+}
+
+/* Tagline on its own row under mask column + wordmark column */
+.hero.gene-animation .tagline-wrapper {
+  flex-basis: 100%;
 }
 
 .hero .wordmark {
@@ -263,5 +280,26 @@
   .hero:not(.gene-animation) {
     min-height: var(--hero-min-height-desktop);
     padding: 26vh 0 0;
+  }
+}
+
+/* Center Gene + ntech as a unit; mask math uses real wordmark offset (hero.js) */
+@media (width >= 1000px) {
+  .hero.gene-animation .gene-animation-flex-center {
+    justify-content: center;
+    padding-inline: 24px;
+  }
+
+  .hero.gene-animation .wordmark-wrapper {
+    justify-content: center;
+  }
+
+  .hero.gene-animation .mask-background {
+    display: none;
+  }
+
+  .hero.gene-animation .wordmark-container {
+    flex: 0 1 73.8%;
+    max-width: 73.8%;
   }
 }
