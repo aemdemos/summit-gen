@@ -1,5 +1,16 @@
 /* hero design tokens */
 :root {
-  --hero-min-height: 80vh;
+  --hero-min-height: 100vh;
   --hero-min-height-desktop: 100vh;
+
+  /* Total scroll height of the pin wrapper (100vh pinned + 200vh animation scroll) */
+  --hero-scroll-height: 300vh;
+
+  /*
+   * Second mask layer on .gene-mask (intersected with gene-mask.svg). Same mask-size/position
+   * as the SVG from hero.js so the fade runs left→right across “Gene” (G solid, ene softer).
+   */
+  --hero-gene-fade-solid-end: 22%;
+  --hero-gene-fade-mid: 46%;
+  --hero-gene-fade-soft: 74%;
 }
