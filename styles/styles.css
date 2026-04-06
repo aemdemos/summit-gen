@@ -382,18 +382,10 @@ main .section.warm-gray {
 
 @media (width >= 1000px) {
   main .section.warm-gray {
-    height: 406px;
-    min-height: 406px;
     padding: 0;
   }
 }
 
-@media (width >= 1400px) {
-  main .section.warm-gray {
-    height: 432px;
-    min-height: 432px;
-  }
-}
 
 main .section.full-width > div {
   max-width: none;
