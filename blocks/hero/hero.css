@@ -287,7 +287,6 @@
 @media (width >= 1000px) {
   .hero.gene-animation .gene-animation-flex-center {
     justify-content: center;
-    padding-inline: 24px;
   }
 
   .hero.gene-animation .wordmark-wrapper {

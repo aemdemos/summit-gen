@@ -26,6 +26,12 @@ const MIN_GENE_BBOX_W = 400;
 /** Scroll helpers (StoryApp). */
 const B_CONST = 218;
 const C_CONST = 56;
+/** `raw` scroll 0…1 maps to timeline `t` 0…SCROLL_T_MAX (StoryApp 1.6). */
+const SCROLL_T_MAX = 1.6;
+/** No mask motion, no wordmark transform change; full wordmark + tagline visible (tune vs --hero-scroll-height). */
+const HERO_SCROLL_HOLD_T = 0.3;
+/** After hold, tagline fades out over this span before ntech / mask animation (was first 0.1 of old t). */
+const HERO_TAGLINE_FADE_T = 0.1;
 
 /** @param {boolean} portrait */
 function portraitMult(portrait) {
@@ -187,16 +193,16 @@ function lerp(a, b, u) {
 }
 
 /**
- * Map scroll `raw` [0,1] to animation state (piecewise linear copy of GSAP timeline 0…1.6).
- * StoryApp tweens use `E(H*B,b)`, `S(B,b)` where `B` is portrait multiplier (8|3) and
- * `H*B` is mask pixel size; `wmTx` uses `S(B,b)` not `S(H*B,b)` (see bundle).
+ * Map scroll `raw` [0,1] to animation state: hold + tagline-only fade, then remapped `ta`.
+ * First zoom segment runs mask + wordmark + ntech fade together (`ntechOpacity` tracks zoom `u`);
+ * later segments continue StoryApp zoom with ntech gone and `.g-mask` on.
  * @param {number} raw
  * @param {{ baseSize: number, baseLeft: number, baseTop: number, maskOuterW: number, wordmarkW: number, wordmarkLeft: number, portrait: boolean }} base
  */
 function scrollToState(raw, base) {
   const mult = portraitMult(base.portrait);
   const { baseSize, baseLeft, baseTop, maskOuterW, wordmarkW } = base;
-  const t = raw * 1.6;
+  const t = raw * SCROLL_T_MAX;
 
   /** @type {{ size: number, leftPos: number, topPos: number, wmScale: number, wmTx: number, taglineOpacity: number, ntechOpacity: number, geneMaskOpacity: number, gMaskOpacity: number }} */
   const fallback = {
@@ -211,8 +217,11 @@ function scrollToState(raw, base) {
     gMaskOpacity: 0,
   };
   if (baseSize <= 0 || wordmarkW <= 0) {
-    if (t <= 0.1) fallback.taglineOpacity = 1 - t / 0.1;
-    else fallback.taglineOpacity = 0;
+    if (t < HERO_SCROLL_HOLD_T) fallback.taglineOpacity = 1;
+    else if (t < HERO_SCROLL_HOLD_T + HERO_TAGLINE_FADE_T) {
+      const u = (t - HERO_SCROLL_HOLD_T) / HERO_TAGLINE_FADE_T;
+      fallback.taglineOpacity = 1 - u;
+    } else fallback.taglineOpacity = 0;
     return fallback;
   }
 
@@ -222,7 +231,7 @@ function scrollToState(raw, base) {
   const tx2 = computeWordmarkTx(maskOuterW, wordmarkW, wl, 25, C_CONST);
   const tx3 = computeWordmarkTx(maskOuterW, wordmarkW, wl, 50, C_CONST);
 
-  const out = {
+  const frozen = {
     size: baseSize,
     leftPos: baseLeft,
     topPos: baseTop,
@@ -231,43 +240,64 @@ function scrollToState(raw, base) {
     taglineOpacity: 1,
     ntechOpacity: 1,
     geneMaskOpacity: 1,
-    /* `.g-mask` only after ntech fades — avoids double mask / ghosting on “Gene” + “ntech”. */
     gMaskOpacity: 0,
   };
 
-  if (t <= 0.1) {
-    out.taglineOpacity = 1 - t / 0.1;
-    return out;
+  if (t < HERO_SCROLL_HOLD_T) {
+    return frozen;
   }
-  out.taglineOpacity = 0;
-
-  if (t < 0.3) {
-    const u = (t - 0.1) / 0.2;
-    out.ntechOpacity = 1 - u;
-    out.gMaskOpacity = 0;
-    return out;
-  }
-  out.ntechOpacity = 0;
-  out.gMaskOpacity = 1;
-  if (t <= 0.6) {
-    out.geneMaskOpacity = 1 - (t - 0.3) / 0.3;
-  } else {
-    out.geneMaskOpacity = 0;
+  if (t < HERO_SCROLL_HOLD_T + HERO_TAGLINE_FADE_T) {
+    const u = (t - HERO_SCROLL_HOLD_T) / HERO_TAGLINE_FADE_T;
+    return { ...frozen, taglineOpacity: 1 - u };
   }
 
-  if (t <= 0.6) {
-    const u = (t - 0.1) / 0.5;
+  const spanAfter = SCROLL_T_MAX - HERO_SCROLL_HOLD_T - HERO_TAGLINE_FADE_T;
+  const ta = 0.1 + Math.min(1, Math.max(0, (t - HERO_SCROLL_HOLD_T - HERO_TAGLINE_FADE_T) / spanAfter)) * (SCROLL_T_MAX - 0.1);
+
+  const out = {
+    size: baseSize,
+    leftPos: baseLeft,
+    topPos: baseTop,
+    wmScale: 1,
+    wmTx: tx0,
+    taglineOpacity: 0,
+    ntechOpacity: 1,
+    geneMaskOpacity: 1,
+    gMaskOpacity: 0,
+  };
+
+  /*
+   * First zoom segment (StoryApp ta 0.1…0.6): drive mask + wordmark from the start of `ta`.
+   * Previously ntech faded with an early return while zoom stayed at 0, then at ta=0.3 zoom
+   * jumped to u=0.4 — now ntechOpacity tracks the same u so Gene+ntech zoom together and
+   * ntech eases out as zoom progresses.
+   */
+  if (ta <= 0.6) {
+    const u = Math.min(1, Math.max(0, (ta - 0.1) / 0.5));
     const endSize = baseSize * mult;
     const endLeft = computeLeftPos(maskOuterW, wordmarkW, baseSize * mult, B_CONST);
     out.size = lerp(baseSize, endSize, u);
     out.leftPos = lerp(baseLeft, endLeft, u);
     out.wmScale = lerp(1, mult, u);
     out.wmTx = lerp(tx0, tx1, u);
+
+    out.ntechOpacity = 1 - u;
+
+    /* Keep Gene illustration at full strength; only ntech fades here (CSS L→R mask softens “ene”). */
+    out.geneMaskOpacity = 1;
+
+    /* `.g-mask` ramps in only while ntech is nearly gone to limit double-mask on “G”. */
+    out.gMaskOpacity = u < 0.8 ? 0 : (u - 0.8) / 0.2;
+
     return out;
   }
 
-  if (t <= 1.0) {
-    const u = (t - 0.6) / 0.4;
+  out.ntechOpacity = 0;
+  out.gMaskOpacity = 1;
+  out.geneMaskOpacity = 0;
+
+  if (ta <= 1.0) {
+    const u = (ta - 0.6) / 0.4;
     const s0 = baseSize * mult;
     const s1 = baseSize * 25;
     const l0 = computeLeftPos(maskOuterW, wordmarkW, baseSize * mult, B_CONST);
@@ -279,7 +309,7 @@ function scrollToState(raw, base) {
     return out;
   }
 
-  const u = (t - 1.0) / 0.6;
+  const u = (ta - 1.0) / 0.6;
   const s0 = baseSize * 25;
   const s1 = baseSize * 50;
   const l0 = computeLeftPos(maskOuterW, wordmarkW, baseSize * 25, C_CONST);
