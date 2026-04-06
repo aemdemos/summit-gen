@@ -17,10 +17,24 @@ export default function decorate(block) {
       if (pic) {
         const picWrapper = pic.closest('div');
         if (picWrapper && picWrapper.children.length === 1) {
-          // picture is only content in column
           picWrapper.classList.add('columns-img-col');
         }
       }
     });
   });
+
+  // "50" mask effect: in warm-gray section, overlay the illustration through the "50" image shape
+  const section = block.closest('.section');
+  if (section && section.classList.contains('warm-gray')) {
+    const imgCol = block.querySelector('.columns-img-col');
+    const img = imgCol?.querySelector('img');
+    if (imgCol && img) {
+      // Hide the original image (it's a flat PNG) and add the mask overlay
+      img.style.opacity = '0';
+      const maskDiv = document.createElement('div');
+      maskDiv.className = 'columns-50-mask';
+      imgCol.style.position = 'relative';
+      imgCol.append(maskDiv);
+    }
+  }
 }

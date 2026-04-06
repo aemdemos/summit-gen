@@ -77,6 +77,36 @@
     line-height: 1.8125;
   }
 
+  /* Warm-gray section: white pill button (matches original gene.com "50 years" CTA) */
+  main > .section.warm-gray.columns-container .columns a.button {
+    background-color: var(--color-white);
+    color: var(--text-color);
+    padding: 10px 48px;
+  }
+
+  main > .section.warm-gray.columns-container .columns a.button:hover {
+    background-color: var(--color-light-gray);
+  }
+
+  /* "50" masked image — illustration shows through the "50" text shape */
+  .section.warm-gray .columns .columns-img-col {
+    position: relative;
+  }
+
+  .section.warm-gray .columns .columns-img-col .columns-50-mask {
+    position: absolute;
+    inset: 0;
+    background: url('/images/hero/hero-desktop.jpg') center / cover no-repeat;
+    mask-image: url('/images/50-years/50-mask-desktop.png');
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-image: url('/images/50-years/50-mask-desktop.png');
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+
   .columns > div > div {
     flex: 1;
     order: unset;
@@ -98,6 +128,15 @@
     margin-bottom: 27px;
   }
 
+  /* "50 years" heading: Gene-Serif 50px (matches gene.com) */
+  .columns h5 {
+    font-family: Gene-Serif-Regular, serif;
+    font-size: 50px;
+    font-weight: 400;
+    line-height: 65px;
+    margin: 0 0 32px;
+  }
+
   .columns > div > div:not(.columns-img-col) p {
     font-size: 17px;
     margin: 7px 25px 0 0;
@@ -112,5 +151,12 @@
 
   .columns > div > .columns-img-col img {
     border-radius: 20px;
+  }
+
+  /* Warm-gray columns: larger description text + proper spacing */
+  .section.warm-gray .columns > div > div:not(.columns-img-col) p {
+    font-size: 20px;
+    line-height: 1.56;
+    margin: 32px 0;
   }
 }
