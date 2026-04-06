@@ -1,5 +1,24 @@
 import { getBlockId } from '../../scripts/scripts.js';
 
+/**
+ * Try to find the hero illustration source for the "50" mask background.
+ * @param {HTMLElement} maskDiv
+ * @returns {boolean} true if background was set
+ */
+function applyMaskBackground(maskDiv) {
+  const heroSource = document.querySelector('.hero picture source');
+  const heroImgEl = document.querySelector('.hero img');
+  const src = heroSource?.srcset?.split(',')[0]?.trim()?.split(' ')[0]
+    || heroImgEl?.currentSrc || heroImgEl?.src || '';
+  if (src) {
+    maskDiv.style.backgroundImage = `url('${src}')`;
+    maskDiv.style.backgroundSize = 'cover';
+    maskDiv.style.backgroundPosition = 'center';
+    return true;
+  }
+  return false;
+}
+
 export default function decorate(block) {
   const blockId = getBlockId('columns');
   block.setAttribute('id', blockId);
@@ -23,9 +42,8 @@ export default function decorate(block) {
     });
   });
 
-  // "50" mask effect: in warm-gray section, use the authored image as
-  // a CSS mask-image so the illustration background shows through its shape.
-  // Both the mask PNG and the illustration background come from DA content.
+  // "50" mask effect: in warm-gray section, the authored "50" PNG is the mask shape.
+  // The illustration background shows through the "50" letter shapes.
   const section = block.closest('.section');
   if (section && section.classList.contains('warm-gray')) {
     const imgCol = block.querySelector('.columns-img-col');
@@ -36,19 +54,28 @@ export default function decorate(block) {
 
       const maskDiv = document.createElement('div');
       maskDiv.className = 'columns-50-mask';
-      // Use the authored "50" image as the mask shape
+
+      // Simple mask: "50" shape = visible area, illustration shows through
       maskDiv.style.maskImage = `url('${maskSrc}')`;
       maskDiv.style.webkitMaskImage = `url('${maskSrc}')`;
 
-      // Use the hero illustration as the background visible through the mask.
-      // Read it from the hero block's authored image if available.
-      const heroImg = document.querySelector('.hero img, .hero picture source');
-      const heroBgSrc = heroImg?.srcset?.split(',')[0]?.trim()?.split(' ')[0]
-        || heroImg?.currentSrc || heroImg?.src || '';
-      if (heroBgSrc) {
-        maskDiv.style.backgroundImage = `url('${heroBgSrc}')`;
-        maskDiv.style.backgroundSize = 'cover';
-        maskDiv.style.backgroundPosition = 'center';
+      // Set the hero illustration as the background
+      if (!applyMaskBackground(maskDiv)) {
+        // Hero not ready yet — watch for it
+        const observer = new MutationObserver(() => {
+          if (applyMaskBackground(maskDiv)) observer.disconnect();
+        });
+        observer.observe(document.querySelector('main') || document.body, {
+          childList: true, subtree: true,
+        });
+        setTimeout(() => {
+          if (!maskDiv.style.backgroundImage || maskDiv.style.backgroundImage === 'none') {
+            maskDiv.style.backgroundImage = "url('/images/hero/hero-desktop.jpg')";
+            maskDiv.style.backgroundSize = 'cover';
+            maskDiv.style.backgroundPosition = 'center';
+          }
+          observer.disconnect();
+        }, 5000);
       }
 
       imgCol.append(maskDiv);

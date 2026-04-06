@@ -97,16 +97,15 @@
   .section.warm-gray .columns .columns-img-col .columns-50-mask {
     position: absolute;
     inset: 0;
-    background-color: rgb(235 230 224);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
-    -webkit-mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
   }
 
   .columns > div > div {
