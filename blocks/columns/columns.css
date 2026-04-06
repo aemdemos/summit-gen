@@ -58,7 +58,6 @@
     display: flex;
     gap: 32px;
     margin: 0 auto;
-    max-width: 1050px;
     position: relative;
     width: 100%;
     flex-direction: column-reverse;
@@ -69,19 +68,20 @@
   }
 
   main > .section.columns-container .columns a.button {
-    padding: 10px 32px;
+    padding: 10px 48px;
     border-radius: 50px;
     text-decoration: none;
     background-color: var(--color-primary-dark);
     color: var(--color-white);
-    line-height: 1.8125;
+    letter-spacing: .03rem;
+    border-color: white;
   }
 
   /* Warm-gray section: white pill button (matches original gene.com "50 years" CTA) */
   main > .section.warm-gray.columns-container .columns a.button {
     background-color: var(--color-white);
     color: var(--text-color);
-    padding: 10px 48px;
+    margin:0;
   }
 
   main > .section.warm-gray.columns-container .columns a.button:hover {
@@ -114,11 +114,12 @@
   }
 
   .columns > div > div:not(.columns-img-col) {
-    padding: var(--spacing-xxl) var(--spacing-xl);
+    gap: 32px;
+    padding:80px 20px;
   }
 }
 
-@media (width >= 1023px) {
+@media (width >= 1024px) {
   /* @font-face uses family "gene-condensed"; Bold is weight 700, not a separate family name */
   main > .section.columns-container .columns h2 {
     font-family: gene-condensed, gene-condensed-fallback, sans-serif;
@@ -131,10 +132,10 @@
 
   /* "50 years" heading: Gene-Serif 50px (matches gene.com) */
   .columns h5 {
-    font-family: Gene-Serif-Regular, serif;
-    font-size: 50px;
+    font-family: gene-serif-regular, serif;
+    font-size: 1.875rem;
     font-weight: 400;
-    line-height: 65px;
+    line-height: 130%;
     margin: 0 0 32px;
   }
 
@@ -144,14 +145,20 @@
   }
 
   .columns > div {
-    gap: 64px;
     flex-direction: row;
-    padding: 34px 25px 55px;
-    max-width: 1030px;
   }
 
   .columns > div > .columns-img-col img {
     border-radius: 20px;
+  }
+
+  /* "50" column: width/height rounding; flex so width/max-width win over flex: 1 siblings */
+  .section.warm-gray .columns > div > .columns-img-col {
+    flex: 0 1 auto;
+    max-width: 600px;
+    min-width: auto;
+    width: round(up, 30%, 1px);
+    min-height: round(up, 100%, 1px);
   }
 
   /* Warm-gray columns: larger description text + proper spacing */
