@@ -88,7 +88,8 @@
     background-color: var(--color-light-gray);
   }
 
-  /* "50" masked image — illustration shows through the "50" text shape */
+  /* "50" masked image — illustration shows through the "50" text shape.
+     JS sets background-image from DA content; mask-image uses the authored "50" PNG. */
   .section.warm-gray .columns .columns-img-col {
     position: relative;
   }
@@ -96,12 +97,13 @@
   .section.warm-gray .columns .columns-img-col .columns-50-mask {
     position: absolute;
     inset: 0;
-    background: url('/images/hero/hero-desktop.jpg') center / cover no-repeat;
-    mask-image: url('/images/50-years/50-mask-desktop.png');
+    background-color: rgb(235 230 224);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
-    -webkit-mask-image: url('/images/50-years/50-mask-desktop.png');
     -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
