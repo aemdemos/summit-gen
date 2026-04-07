@@ -121,6 +121,7 @@ main .section:has(.cards) > div {
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
     padding: 7.5px;
+    margin-top: 0;
   }
 
   /* Card tile: white box, equal height, rounded corners, subtle shadow */
