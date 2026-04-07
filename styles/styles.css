@@ -3,6 +3,10 @@
  * Migrated from https://www.gene.com/
  */
 
+html {
+  scroll-snap-type: y proximity;
+}
+
 :root {
   /* colors — primary */
   --color-primary-dark: #30373d;
@@ -378,6 +382,7 @@ main .section.warm-gray {
   display: flex;
   align-items: center;
   justify-content: center;
+  scroll-snap-align: start;
 }
 
 @media (width >= 1000px) {
