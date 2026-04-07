@@ -22,20 +22,140 @@ function setSlideSectionBackdrop(section, src) {
   section.style.setProperty('--columns-slide-bg-image', `url("${safe}")`);
 }
 
+const firstSrcsetUrl = (srcset) => srcset.split(',')[0]?.trim()?.split(/\s+/)[0] || '';
+
 /**
- * Try to find the hero illustration source for the "50" mask background.
- * @param {HTMLElement} maskDiv
- * @returns {boolean} true if background was set
+ * Same breakpoint can list WebP then PNG; `mask-image` is more reliable with PNG alpha.
+ * @param {HTMLSourceElement[]} sources
+ * @param {string} media
+ * @returns {string}
  */
-function applyMaskBackground(maskDiv) {
-  const src = getHeroIllustrationUrl();
-  if (src) {
-    maskDiv.style.backgroundImage = `url('${src}')`;
-    maskDiv.style.backgroundSize = 'cover';
-    maskDiv.style.backgroundPosition = 'center';
-    return true;
+function firstSrcsetUrlForMedia(sources, media) {
+  const same = sources.filter((s) => (s.media || '') === media);
+  const png = same.find((s) => /image\/png/i.test(s.type || ''));
+  if (png?.srcset) return firstSrcsetUrl(png.srcset);
+  const jpeg = same.find((s) => /image\/jpe?g/i.test(s.type || ''));
+  if (jpeg?.srcset) return firstSrcsetUrl(jpeg.srcset);
+  const any = same.find((s) => s.srcset);
+  return any ? firstSrcsetUrl(any.srcset) : '';
+}
+
+/**
+ * @param {HTMLSourceElement[]} sources
+ * @param {number} vw
+ * @returns {string}
+ */
+function pickSrcFromPictureSources(sources, vw) {
+  if (vw >= 1280) {
+    const lg = sources.find((s) => /min-width:\s*1280/.test(s.media || ''));
+    if (lg?.srcset) return firstSrcsetUrlForMedia(sources, lg.media || '');
   }
-  return false;
+  if (vw >= 960) {
+    const md = sources.find((s) => /min-width:\s*960/.test(s.media || ''))
+      || sources.find((s) => /min-width:\s*900/.test(s.media || ''))
+      || sources.find((s) => /min-width:\s*600/.test(s.media || ''));
+    if (md?.srcset) return firstSrcsetUrlForMedia(sources, md.media || '');
+  } else if (vw >= 600) {
+    const sm = sources.find((s) => /min-width:\s*600/.test(s.media || ''));
+    if (sm?.srcset) return firstSrcsetUrlForMedia(sources, sm.media || '');
+  }
+  const uncond = sources.find((s) => !s.media);
+  if (uncond?.srcset) return firstSrcsetUrlForMedia(sources, uncond.media || '');
+  if (sources[0]?.srcset) return firstSrcsetUrl(sources[0].srcset);
+  return '';
+}
+
+/**
+ * StoryApp `x`: prefer responsive <source> by viewport; fall back so URL is never empty when img exists.
+ * @param {HTMLImageElement} img
+ * @returns {string}
+ */
+function pickImageBackgroundSrcForViewport(img) {
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+  const picture = img.closest('picture');
+  if (!picture) return '';
+  const sources = [...picture.querySelectorAll('source[srcset]')];
+  return pickSrcFromPictureSources(sources, vw);
+}
+
+/**
+ * URL for StoryApp mask `url(x)` — browser-chosen asset first, then pick(), then raw src.
+ * @param {HTMLImageElement} img
+ * @returns {string}
+ */
+function resolveImageBackgroundMaskUrl(img) {
+  /* Lazy `img`: currentSrc may be empty before layout; attribute `src` is always a valid mask URL. */
+  return pickImageBackgroundSrcForViewport(img)
+    || img.getAttribute('src')
+    || img.src
+    || img.currentSrc
+    || '';
+}
+
+/** Resolve relative URLs — Chrome often fails mask-image with `./media…` paths. */
+function toMaskUrl(href) {
+  if (!href) return '';
+  try {
+    return new URL(href, document.baseURI).href;
+  } catch {
+    return href;
+  }
+}
+
+/** Safe `url("...")` for mask-image (handles quotes in path). */
+function cssUrlValue(href) {
+  const abs = toMaskUrl(href);
+  const safe = abs.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return `url("${safe}")`;
+}
+
+/**
+ * StoryApp bar-image-container inline styles (CgR3EhWF.js ~12503–12507) + URji_XlK.css xor/exclude.
+ * maskImage: `url(x), linear-gradient(black, black)` — never leave mask at `none` when `x` is valid.
+ * @param {HTMLElement} imgCol
+ * @param {string|null} imageBackgroundSrc
+ */
+function applyFlexibleCtaBarMask(imgCol, imageBackgroundSrc) {
+  imgCol.style.backgroundColor = 'rgb(235, 230, 224)';
+  imgCol.style.flexShrink = '0';
+  imgCol.style.transform = 'translateZ(0)';
+
+  if (!imageBackgroundSrc || imageBackgroundSrc === '') {
+    imgCol.style.maskImage = 'none';
+    imgCol.style.webkitMaskImage = 'none';
+    return;
+  }
+
+  /*
+   * Asset: opaque “50” on transparent. Single-layer mask would paint gray only on the digits.
+   * StoryApp stack: url(image) + full opaque plane, xor/exclude → overlap clears → gray bar with transparent “50”.
+   */
+  const stack = `${cssUrlValue(imageBackgroundSrc)}, linear-gradient(#000 0 0)`;
+  imgCol.style.maskImage = stack;
+  imgCol.style.webkitMaskImage = stack;
+}
+
+/**
+ * StoryApp F1: preload `image_background`; empty src must still invoke callback (otherwise mask stays none).
+ * @param {string} src
+ * @param {() => void} onReady
+ */
+function preloadImageBackground(src, onReady) {
+  if (!src) {
+    queueMicrotask(onReady);
+    return;
+  }
+  const probe = new Image();
+  let called = false;
+  const done = () => {
+    if (called) return;
+    called = true;
+    onReady();
+  };
+  probe.addEventListener('load', done, { once: true });
+  probe.addEventListener('error', done, { once: true });
+  probe.src = src;
+  if (probe.complete) done();
 }
 
 export default function decorate(block) {
@@ -48,7 +168,6 @@ export default function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
 
-  // setup image columns
   [...block.children].forEach((row) => {
     [...row.children].forEach((col) => {
       const pic = col.querySelector('picture');
@@ -61,20 +180,16 @@ export default function decorate(block) {
     });
   });
 
-  // "50" mask effect: in warm-gray section, the authored "50" PNG is the mask shape.
-  // The illustration background shows through the "50" letter shapes.
-  // Shell: 100vh with hero-matched backdrop; inner panel: warm-gray band with columns.
   const section = block.closest('.section');
   if (section && section.classList.contains('warm-gray')) {
     const imgCol = block.querySelector('.columns-img-col');
     const img = imgCol?.querySelector('img');
     if (imgCol && img) {
       section.classList.add('columns-slide-section');
-      block.classList.add('columns-gene-slide');
+      block.classList.add('columns-gene-slide', 'columns-flexible-cta-image-left');
       const panel = block.parentElement;
       if (panel) panel.classList.add('columns-gene-slide-panel');
 
-      /* Root scroll-snap (gene.com: slide “lands” when this section nears the viewport). */
       document.documentElement.classList.add('columns-gene-slide-snap');
 
       const syncBackdrop = () => {
@@ -97,35 +212,30 @@ export default function decorate(block) {
         }, 5000);
       }
 
-      const maskSrc = img.currentSrc || img.src;
       img.style.opacity = '0';
+      img.style.pointerEvents = 'none';
+      img.setAttribute('aria-hidden', 'true');
 
-      const maskDiv = document.createElement('div');
-      maskDiv.className = 'columns-50-mask';
+      imgCol.classList.add('columns-flexible-cta-bar-image', 'with-mask');
 
-      // Simple mask: "50" shape = visible area, illustration shows through
-      maskDiv.style.maskImage = `url('${maskSrc}')`;
-      maskDiv.style.webkitMaskImage = `url('${maskSrc}')`;
+      const paintBar = () => {
+        const url = resolveImageBackgroundMaskUrl(img);
+        applyFlexibleCtaBarMask(imgCol, url || null);
+      };
 
-      // Set the hero illustration as the background
-      if (!applyMaskBackground(maskDiv)) {
-        const maskObserver = new MutationObserver(() => {
-          if (applyMaskBackground(maskDiv)) maskObserver.disconnect();
-        });
-        maskObserver.observe(document.querySelector('main') || document.body, {
-          childList: true, subtree: true,
-        });
-        setTimeout(() => {
-          if (!maskDiv.style.backgroundImage || maskDiv.style.backgroundImage === 'none') {
-            maskDiv.style.backgroundImage = "url('/images/hero/hero-desktop.jpg')";
-            maskDiv.style.backgroundSize = 'cover';
-            maskDiv.style.backgroundPosition = 'center';
-          }
-          maskObserver.disconnect();
-        }, 5000);
-      }
+      paintBar();
+      preloadImageBackground(resolveImageBackgroundMaskUrl(img), paintBar);
+      img.addEventListener('load', paintBar, { once: true });
 
-      imgCol.append(maskDiv);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(paintBar);
+      });
+
+      const onResize = () => {
+        paintBar();
+        preloadImageBackground(resolveImageBackgroundMaskUrl(img), paintBar);
+      };
+      window.addEventListener('resize', onResize, { passive: true });
     }
   }
 }

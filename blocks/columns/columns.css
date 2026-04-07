@@ -57,6 +57,48 @@ main > .section.columns-container > div {
 }
 
 /*
+ * StoryApp-URji_XlK.css — .flexible-cta .content-container .bar-image-container (+ .with-mask, 960px).
+ * Inline mask stack from StoryApp-CgR3EhWF.js (flexible_cta, image-left, image_mask): see columns.js.
+ */
+.section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image {
+  position: relative;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  mask-type: alpha;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  mask-repeat: no-repeat, no-repeat;
+
+  /* PNG contained; gradient plane fills the box (StoryApp bar-image-container). */
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-size: contain, 100% 100%;
+  mask-size: contain, 100% 100%;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-position: center center, center center;
+  mask-position: center center, center center;
+  min-width: 100%;
+}
+
+.section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image.with-mask {
+  aspect-ratio: 3 / 1;
+}
+
+@media (width >= 960px) {
+  .section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image {
+    max-width: 600px;
+    min-width: auto;
+    width: round(up, 30%, 1px);
+    min-height: round(up, 100%, 1px);
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/*
  * gene.com-style "50 years" slide: outer shell = previous (hero) illustration at 100dvh;
  * inner panel = warm-gray band with columns only.
  * Fixed backdrop + scroll snap (html.columns-gene-slide-snap from columns.js): less visible seam
@@ -104,13 +146,22 @@ main .section.warm-gray.columns-slide-section {
   padding: 0;
 }
 
+/*
+ * Panel must stay transparent so masked “holes” in the bar reveal the section’s hero backdrop.
+ * Warm gray lives on the copy column only (same color as the bar fill).
+ */
 main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
-  background-color: var(--color-warm-gray);
+  background-color: transparent;
   box-sizing: border-box;
   flex: 0 0 auto;
   width: 100%;
   max-width: none;
   margin-inline: 0;
+}
+
+main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:not(.columns-img-col) {
+  background-color: var(--color-warm-gray);
+  box-sizing: border-box;
 }
 
 @media (width >= 900px) {
@@ -149,24 +200,8 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
     background-color: var(--color-light-gray);
   }
 
-  /* "50" masked image — illustration shows through the "50" text shape.
-     JS sets background-image from DA content; mask-image uses the authored "50" PNG. */
   .section.warm-gray .columns .columns-img-col {
     position: relative;
-  }
-
-  .section.warm-gray .columns .columns-img-col .columns-50-mask {
-    position: absolute;
-    inset: 0;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* stylelint-disable-next-line property-no-vendor-prefix */
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
   }
 
   .columns > div > div {
@@ -224,17 +259,13 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
     border-radius: 20px;
   }
 
-  /* "50" column: width/height rounding; flex so width/max-width win over flex: 1 siblings */
-  .section.warm-gray .columns > div > .columns-img-col {
+  /* "50" column (non–flexible-cta): width/height rounding; gene slide uses StoryApp bar rules at 960px */
+  .section.warm-gray .columns:not(.columns-gene-slide) > div > .columns-img-col {
     flex: 0 1 auto;
     max-width: 600px;
     min-width: auto;
     width: round(up, 30%, 1px);
     min-height: round(up, 100%, 1px);
-  }
-
-  .section.warm-gray .columns.columns-gene-slide > div > .columns-img-col {
-    min-height: auto;
   }
 
   /* Warm-gray columns: larger description text + proper spacing */
@@ -262,5 +293,23 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
   .section.warm-gray .columns > div > div:not(.columns-img-col) p {
     font-size: 20px;
     line-height: 156%;
+  }
+}
+
+/*
+ * StoryApp .flexible-cta.image-left .content — overrides .columns > div column-reverse (900px+).
+ * max-width 960px → column; min-width 961px → row (StoryApp-URji_XlK.css).
+ */
+.columns.columns-gene-slide.columns-flexible-cta-image-left > div {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+@media (width > 960px) {
+  .columns.columns-gene-slide.columns-flexible-cta-image-left > div {
+    flex-direction: row;
   }
 }
