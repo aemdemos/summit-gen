@@ -251,6 +251,7 @@ main > .section.columns-container > div {
   main .section.cards-container {
     margin: 0;
     padding-bottom: 64px;
+    padding-top: 54px;
   }
 
   /* "50 years" heading: Gene-Serif 50px (matches gene.com) */
@@ -274,11 +275,10 @@ main > .section.columns-container > div {
   }
 
   .columns:not(.columns-gene-slide) > div {
-    height: 406px;
     gap: 64px;
     padding-left: 25px;
     padding-right: 25px;
-
+    padding-bottom: 45px;
   }
 
   .columns > div {

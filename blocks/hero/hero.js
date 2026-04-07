@@ -374,8 +374,21 @@ function isHeroGeneSnapTargetSection(sectionEl) {
 }
 
 /**
- * After a forward snap, drop snap state once the gene section is fully above the viewport so
- * scrolling up from video / lower sections does not jump back to the hero pin end.
+ * Rect for “past the gene handoff” checks: the columns row, not the whole section (video may live
+ * in the same `.columns-slide-section`, so the section box stays tall while the user is on video).
+ * @param {HTMLElement} sectionEl
+ * @returns {DOMRect}
+ */
+function getGeneHandoffExitRect(sectionEl) {
+  const panel = sectionEl.querySelector('.columns-gene-slide-panel')
+    || sectionEl.querySelector('.columns.columns-gene-slide');
+  const el = panel instanceof HTMLElement ? panel : sectionEl;
+  return el.getBoundingClientRect();
+}
+
+/**
+ * After a forward snap, drop snap state once the gene **columns** block is fully above the viewport
+ * (including when a video shares the same section below the columns row).
  * @param {HTMLElement} scrollPin
  * @param {{ value: boolean }} snappedRef
  */
@@ -386,25 +399,10 @@ function clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef) {
     snappedRef.value = false;
     return;
   }
-  const r = next.getBoundingClientRect();
-  if (r.bottom <= 0) {
+  const r = getGeneHandoffExitRect(next);
+  if (r.bottom <= 8) {
     snappedRef.value = false;
   }
-}
-
-/**
- * `.columns-slide-section` is min 100dvh with `justify-content: center` — section top is far above
- * the visible warm-gray / columns row; snapping to `section` leaves a band of fixed hero backdrop.
- * @param {HTMLElement} sectionEl
- * @returns {HTMLElement}
- */
-function resolveHeroSnapTargetEl(sectionEl) {
-  if (sectionEl.classList.contains('columns-slide-section')) {
-    const inner = sectionEl.querySelector('.columns-gene-slide-panel')
-      || sectionEl.querySelector('.columns.columns-gene-slide');
-    if (inner instanceof HTMLElement) return inner;
-  }
-  return sectionEl;
 }
 
 /**
@@ -433,6 +431,15 @@ function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scroll
   clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef);
   if (!scrolledUp || !snappedRef.value) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const next = scrollPin.nextElementSibling;
+  if (next instanceof HTMLElement && isHeroGeneSnapTargetSection(next)) {
+    const exitR = getGeneHandoffExitRect(next);
+    if (exitR.bottom <= 8) {
+      snappedRef.value = false;
+      return;
+    }
+  }
 
   const yEnd = getHeroPinEndScrollY(scrollPin);
   if (yEnd === null) return;
@@ -469,12 +476,13 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
   if (!(next instanceof HTMLElement)) return;
   if (!isHeroGeneSnapTargetSection(next)) return;
 
-  /* `raw` stays clamped at 1 once the pin is scrolled through; clearing snappedRef past the gene
-   * would otherwise make `rawEnd` true every frame and fight scroll toward video / lower content. */
-  const geneSectionRect = next.getBoundingClientRect();
-  if (geneSectionRect.bottom <= 0) return;
+  /* `raw` stays clamped at 1 below the pin; use columns row rect — not the whole section if video
+   * is inside the same `.columns-slide-section`. */
+  const exitR = getGeneHandoffExitRect(next);
+  if (exitR.bottom <= 8) return;
 
-  const target = resolveHeroSnapTargetEl(next);
+  /* Gene slide: snap to section root so tall shells + panel `margin-top` keep the lead-in in view. */
+  const target = next;
   const offset = readFixedHeaderOffsetPx();
   const tr = target.getBoundingClientRect();
   const vh = window.innerHeight;
