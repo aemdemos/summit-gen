@@ -56,6 +56,63 @@ main > .section.columns-container > div {
   margin:0;
 }
 
+/*
+ * gene.com-style "50 years" slide: outer shell = previous (hero) illustration at 100dvh;
+ * inner panel = warm-gray band with columns only.
+ * Fixed backdrop + scroll snap (html.columns-gene-slide-snap from columns.js): less visible seam
+ * from the pinned hero and a snap when this slide reaches the viewport.
+ */
+@media (width >= 1024px) {
+  html.columns-gene-slide-snap {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: var(--header-height, 0);
+  }
+}
+
+@media (width >= 1024px) and (prefers-reduced-motion: no-preference) {
+  main .section.warm-gray.columns-slide-section {
+    /* Same crop as hero cover layers; fixed = continuous with viewport while scrolling. */
+    background-attachment: fixed;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.columns-gene-slide-snap {
+    scroll-snap-type: none;
+  }
+
+  main .section.warm-gray.columns-slide-section {
+    background-attachment: scroll;
+  }
+}
+
+main .section.warm-gray.columns-slide-section {
+  background-color: transparent;
+  background-image: var(--columns-slide-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
+  background-color: var(--color-warm-gray);
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
 @media (width >= 900px) {
   .columns > div {
     align-items: center;
@@ -149,9 +206,18 @@ main > .section.columns-container > div {
     margin: 7px 25px 0 0;
   }
 
+  .columns:not(.columns-gene-slide) > div {
+    height: 406px;
+  }
+
   .columns > div {
-    height:406px;
     flex-direction: row;
+  }
+
+  .columns.columns-gene-slide > div {
+    height: auto;
+    min-height: 0;
+    align-items: center;
   }
 
   .columns > div > .columns-img-col img {
@@ -167,6 +233,10 @@ main > .section.columns-container > div {
     min-height: round(up, 100%, 1px);
   }
 
+  .section.warm-gray .columns.columns-gene-slide > div > .columns-img-col {
+    min-height: auto;
+  }
+
   /* Warm-gray columns: larger description text + proper spacing */
   .section.warm-gray .columns > div > div:not(.columns-img-col) p {
     font-size: 20px;
@@ -177,8 +247,8 @@ main > .section.columns-container > div {
 }
 
 @media (width >= 1400px) {
-  .columns > div  {
-    height:432px;
+  .columns:not(.columns-gene-slide) > div {
+    height: 432px;
   }
 
   .columns h5 {

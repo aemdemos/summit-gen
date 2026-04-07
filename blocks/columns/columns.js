@@ -1,15 +1,34 @@
 import { getBlockId } from '../../scripts/scripts.js';
 
 /**
+ * Hero illustration URL (same asset as the section above this block).
+ * @returns {string}
+ */
+function getHeroIllustrationUrl() {
+  const heroSource = document.querySelector('.hero picture source');
+  const heroImgEl = document.querySelector('.hero img');
+  return heroSource?.srcset?.split(',')[0]?.trim()?.split(' ')[0]
+    || heroImgEl?.currentSrc || heroImgEl?.src || '';
+}
+
+/**
+ * Full-viewport slide shell uses the same image as the hero for continuity.
+ * @param {HTMLElement} section
+ * @param {string} src
+ */
+function setSlideSectionBackdrop(section, src) {
+  if (!src) return;
+  const safe = src.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  section.style.setProperty('--columns-slide-bg-image', `url("${safe}")`);
+}
+
+/**
  * Try to find the hero illustration source for the "50" mask background.
  * @param {HTMLElement} maskDiv
  * @returns {boolean} true if background was set
  */
 function applyMaskBackground(maskDiv) {
-  const heroSource = document.querySelector('.hero picture source');
-  const heroImgEl = document.querySelector('.hero img');
-  const src = heroSource?.srcset?.split(',')[0]?.trim()?.split(' ')[0]
-    || heroImgEl?.currentSrc || heroImgEl?.src || '';
+  const src = getHeroIllustrationUrl();
   if (src) {
     maskDiv.style.backgroundImage = `url('${src}')`;
     maskDiv.style.backgroundSize = 'cover';
@@ -44,11 +63,40 @@ export default function decorate(block) {
 
   // "50" mask effect: in warm-gray section, the authored "50" PNG is the mask shape.
   // The illustration background shows through the "50" letter shapes.
+  // Shell: 100vh with hero-matched backdrop; inner panel: warm-gray band with columns.
   const section = block.closest('.section');
   if (section && section.classList.contains('warm-gray')) {
     const imgCol = block.querySelector('.columns-img-col');
     const img = imgCol?.querySelector('img');
     if (imgCol && img) {
+      section.classList.add('columns-slide-section');
+      block.classList.add('columns-gene-slide');
+      const panel = block.parentElement;
+      if (panel) panel.classList.add('columns-gene-slide-panel');
+
+      /* Root scroll-snap (gene.com: slide “lands” when this section nears the viewport). */
+      document.documentElement.classList.add('columns-gene-slide-snap');
+
+      const syncBackdrop = () => {
+        const src = getHeroIllustrationUrl();
+        if (src) setSlideSectionBackdrop(section, src);
+        return Boolean(src);
+      };
+      if (!syncBackdrop()) {
+        const backdropObserver = new MutationObserver(() => {
+          if (syncBackdrop()) backdropObserver.disconnect();
+        });
+        backdropObserver.observe(document.querySelector('main') || document.body, {
+          childList: true, subtree: true,
+        });
+        setTimeout(() => {
+          if (!section.style.getPropertyValue('--columns-slide-bg-image')) {
+            setSlideSectionBackdrop(section, '/images/hero/hero-desktop.jpg');
+          }
+          backdropObserver.disconnect();
+        }, 5000);
+      }
+
       const maskSrc = img.currentSrc || img.src;
       img.style.opacity = '0';
 
@@ -61,11 +109,10 @@ export default function decorate(block) {
 
       // Set the hero illustration as the background
       if (!applyMaskBackground(maskDiv)) {
-        // Hero not ready yet — watch for it
-        const observer = new MutationObserver(() => {
-          if (applyMaskBackground(maskDiv)) observer.disconnect();
+        const maskObserver = new MutationObserver(() => {
+          if (applyMaskBackground(maskDiv)) maskObserver.disconnect();
         });
-        observer.observe(document.querySelector('main') || document.body, {
+        maskObserver.observe(document.querySelector('main') || document.body, {
           childList: true, subtree: true,
         });
         setTimeout(() => {
@@ -74,7 +121,7 @@ export default function decorate(block) {
             maskDiv.style.backgroundSize = 'cover';
             maskDiv.style.backgroundPosition = 'center';
           }
-          observer.disconnect();
+          maskObserver.disconnect();
         }, 5000);
       }
 
