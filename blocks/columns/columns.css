@@ -89,10 +89,15 @@ main > .section.columns-container > div {
 }
 
 @media (width >= 960px) {
+  /*
+   * StoryApp uses 30% of a full-bleed row (≈ viewport). Use 30vw (not 30% of section inner width).
+   * `.columns > div > div { flex: 1 }` otherwise grows this item past `width` in the row layout.
+   */
   .section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image {
+    flex: 0 0 auto;
     max-width: 600px;
     min-width: auto;
-    width: round(up, 30%, 1px);
+    width: round(up, 30vw, 1px);
     min-height: round(up, 100%, 1px);
     aspect-ratio: 4 / 3;
   }
@@ -168,7 +173,6 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
   .columns > div {
     align-items: center;
     display: flex;
-    gap: 32px;
     margin: 0 auto;
     position: relative;
     width: 100%;
@@ -251,7 +255,7 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
 
   .columns.columns-gene-slide > div {
     height: auto;
-    min-height: 0;
+    min-height: 406px;
     align-items: center;
   }
 
@@ -278,7 +282,11 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
 }
 
 @media (width >= 1400px) {
-  .columns:not(.columns-gene-slide) > div {
+  .columns.columns-gene-slide > div {
+    height: 432px;
+  }
+  
+.columns:not(.columns-gene-slide) > div {
     height: 432px;
   }
 
