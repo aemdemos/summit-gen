@@ -363,6 +363,36 @@ function readFixedHeaderOffsetPx() {
 }
 
 /**
+ * Hero pin snap only for the gene handoff: next section is warm-gray **and** the columns gene slide
+ * (`.columns-slide-section` from columns.js). Warm-gray video or other columns blocks must not jump.
+ * @param {HTMLElement} sectionEl
+ * @returns {boolean}
+ */
+function isHeroGeneSnapTargetSection(sectionEl) {
+  return sectionEl.classList.contains('warm-gray')
+    && sectionEl.classList.contains('columns-slide-section');
+}
+
+/**
+ * After a forward snap, drop snap state once the gene section is fully above the viewport so
+ * scrolling up from video / lower sections does not jump back to the hero pin end.
+ * @param {HTMLElement} scrollPin
+ * @param {{ value: boolean }} snappedRef
+ */
+function clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef) {
+  if (!snappedRef.value) return;
+  const next = scrollPin.nextElementSibling;
+  if (!(next instanceof HTMLElement) || !isHeroGeneSnapTargetSection(next)) {
+    snappedRef.value = false;
+    return;
+  }
+  const r = next.getBoundingClientRect();
+  if (r.bottom <= 0) {
+    snappedRef.value = false;
+  }
+}
+
+/**
  * `.columns-slide-section` is min 100dvh with `justify-content: center` — section top is far above
  * the visible warm-gray / columns row; snapping to `section` leaves a band of fixed hero backdrop.
  * @param {HTMLElement} sectionEl
@@ -377,18 +407,6 @@ function resolveHeroSnapTargetEl(sectionEl) {
   return sectionEl;
 }
 
-/**
- * After the long hero pin, align the next `main` block under the fixed header.
- *
- * Tall pins (e.g. 700vh): `pinRect.bottom` stays well below the fold until raw≈1, so
- * `pinRect.bottom <= innerHeight` was almost never true — the snap never ran. We instead
- * detect the transient “peek” frame: next section intersects the viewport but its top is still
- * below the header offset (band visible at bottom), while raw shows we are deep in the pin.
- * Also snap when raw reaches the end (float-safe).
- *
- * @param {HTMLElement} scrollPin
- * @param {{ value: boolean }} snappedRef
- */
 /**
  * Document scroll Y where the hero pin progress is exactly at the end (raw === 1).
  * @param {HTMLElement} scrollPin
@@ -412,6 +430,7 @@ function getHeroPinEndScrollY(scrollPin) {
  * @param {boolean} scrolledUp
  */
 function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scrolledUp) {
+  clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef);
   if (!scrolledUp || !snappedRef.value) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -432,6 +451,7 @@ function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scroll
 }
 
 function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef) {
+  clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef);
   if (blockForwardSnapRef.value) return;
 
   const pinRect = scrollPin.getBoundingClientRect();
@@ -447,6 +467,12 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
 
   const next = scrollPin.nextElementSibling;
   if (!(next instanceof HTMLElement)) return;
+  if (!isHeroGeneSnapTargetSection(next)) return;
+
+  /* `raw` stays clamped at 1 once the pin is scrolled through; clearing snappedRef past the gene
+   * would otherwise make `rawEnd` true every frame and fight scroll toward video / lower content. */
+  const geneSectionRect = next.getBoundingClientRect();
+  if (geneSectionRect.bottom <= 0) return;
 
   const target = resolveHeroSnapTargetEl(next);
   const offset = readFixedHeaderOffsetPx();
@@ -575,7 +601,7 @@ function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntech
   window.addEventListener('scroll', onScroll, { passive: true });
 
   const nextSection = scrollPin.nextElementSibling;
-  if (nextSection instanceof HTMLElement) {
+  if (nextSection instanceof HTMLElement && isHeroGeneSnapTargetSection(nextSection)) {
     const io = new IntersectionObserver(
       () => {
         trySnapAfterScrollSettled();
