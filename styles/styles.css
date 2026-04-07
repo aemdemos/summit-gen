@@ -339,12 +339,13 @@ main > .section:is(.columns-container, .cards-container) > div {
 }
 
 main > .section:has(.video) {
-  margin:30px 0;
+  margin:0;
 }
 
 /* Section that contains a video block — full-bleed inner wrapper */
 main > .section:has(.video) > div {
   padding: 0;
+  max-width: 100%;
 }
 
 /* section metadata variants */
