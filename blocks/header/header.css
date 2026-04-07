@@ -604,7 +604,7 @@ header nav[aria-expanded='true'] .nav-tools {
   }
 }
 
-@media (min-width: 1280px) {
+@media (width >= 1280px) {
   header nav[aria-expanded='true'] .nav-sections .default-content-wrapper > ul:first-child {
     padding-left:152px;
   }
