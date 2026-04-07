@@ -239,6 +239,11 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
     margin-bottom: 27px;
   }
 
+  main .section.cards-container {
+    margin: 0;
+    padding-bottom: 64px;
+  }
+
   /* "50 years" heading: Gene-Serif 50px (matches gene.com) */
   .columns h5 {
     font-family: gene-serif-regular, serif;
@@ -248,13 +253,23 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
     margin: 0 0 32px;
   }
 
+
   .columns > div > div:not(.columns-img-col) p {
     font-size: 17px;
     margin: 7px 25px 0 0;
   }
 
+  .columns:not(.columns-gene-slide) {
+    margin: 0 auto;
+    max-width: 1140px;
+  }
+
   .columns:not(.columns-gene-slide) > div {
     height: 406px;
+    gap: 64px;
+    padding-left: 25px;
+    padding-right: 25px;
+
   }
 
   .columns > div {
@@ -269,6 +284,10 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
 
   .columns > div > .columns-img-col img {
     border-radius: 20px;
+  }
+
+  .columns:not(.columns-gene-slide) > div > .columns-img-col img {
+    width: 90%;
   }
 
   /* "50" column (non–flexible-cta): width/height rounding; gene slide uses StoryApp bar rules at 960px */
@@ -321,6 +340,12 @@ padding-right:0;
     font-size: 20px;
     line-height: 156%;
   }
+}
+
+/* Copy column: no padding when the columns block shares a section with cards (section > div > …, not section > .columns). */
+main .section.cards-container .columns > div > div:not(.columns-img-col),
+main .section:has(.cards) .columns > div > div:not(.columns-img-col) {
+  padding: 0;
 }
 
 /*
