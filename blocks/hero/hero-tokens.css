@@ -4,7 +4,7 @@
   --hero-min-height-desktop: 100vh;
 
   /* Total scroll height of the pin wrapper (100vh pinned + 200vh animation scroll) */
-  --hero-scroll-height: 700vh;
+  --hero-scroll-height: 600vh;
 
   /*
    * Second mask layer on .gene-mask (intersected with gene-mask.svg). Same mask-size/position
