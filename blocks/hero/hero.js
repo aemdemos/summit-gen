@@ -490,13 +490,8 @@ export default async function decorate(block) {
   if (!img || !h1) return;
 
   const wordmarkText = h1.textContent.trim();
-  // Pick highest-res source: prefer <source> with largest width, fall back to img.src
-  const picture = block.querySelector('picture');
-  const sources = picture ? [...picture.querySelectorAll('source[srcset]')] : [];
-  const jpegSource = sources.find((s) => /image\/jpe?g/i.test(s.type || '') && /min-width/.test(s.media || ''))
-    || sources.find((s) => /min-width/.test(s.media || ''))
-    || sources[0];
-  const imgSrc = jpegSource?.srcset?.split(',')[0]?.trim()?.split(/\s+/)[0] || img.src;
+  // Use highest-res local image (2850×1800) — DA caps at 2000px which is too low for the mask effect
+  const imgSrc = '/images/hero/hero-desktop.jpg';
 
   let taglineText = '';
   let sibling = h1.nextElementSibling;
