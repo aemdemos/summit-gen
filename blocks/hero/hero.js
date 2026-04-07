@@ -490,7 +490,8 @@ export default async function decorate(block) {
   if (!img || !h1) return;
 
   const wordmarkText = h1.textContent.trim();
-  const imgSrc = img.src;
+  // Use highest-res local image (2850×1800) — DA caps at 2000px which is too low for the mask effect
+  const imgSrc = '/images/hero/hero-desktop.jpg';
 
   let taglineText = '';
   let sibling = h1.nextElementSibling;

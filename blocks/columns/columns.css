@@ -52,13 +52,136 @@
   background-color: var(--color-light-gray);
 }
 
+main > .section.columns-container > div {
+  margin:0;
+}
+
+/*
+ * StoryApp-URji_XlK.css — .flexible-cta .content-container .bar-image-container (+ .with-mask, 960px).
+ * Inline mask stack from StoryApp-CgR3EhWF.js (flexible_cta, image-left, image_mask): see columns.js.
+ */
+.section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image {
+  position: relative;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  mask-type: alpha;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-repeat: no-repeat, no-repeat;
+  mask-repeat: no-repeat, no-repeat;
+
+  /* PNG contained; gradient plane fills the box (StoryApp bar-image-container). */
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-size: contain, 100% 100%;
+  mask-size: contain, 100% 100%;
+  /* stylelint-disable-next-line property-no-vendor-prefix */
+  -webkit-mask-position: center center, center center;
+  mask-position: center center, center center;
+  min-width: 100%;
+}
+
+.section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image.with-mask {
+  aspect-ratio: 3 / 1;
+}
+
+@media (width >= 960px) {
+  /*
+   * StoryApp uses 30% of a full-bleed row (≈ viewport). Use 30vw (not 30% of section inner width).
+   * `.columns > div > div { flex: 1 }` otherwise grows this item past `width` in the row layout.
+   */
+  .section.warm-gray .columns.columns-gene-slide .columns-img-col.columns-flexible-cta-bar-image {
+    flex: 0 0 auto;
+    max-width: 600px;
+    min-width: auto;
+    width: round(up, 30vw, 1px);
+    min-height: round(up, 100%, 1px);
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/*
+ * gene.com-style "50 years" slide: outer shell = previous (hero) illustration at 100dvh;
+ * inner panel = warm-gray band with columns only.
+ * Same image + cover + center as `.hero .gene-mask`; `fixed` keeps it pinned to the viewport while
+ * this section scrolls, so the handoff from the sticky hero reads as one continuous backdrop.
+ */
+@media (width >= 1024px) {
+  html.columns-gene-slide-snap {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: var(--header-height, 0);
+  }
+}
+
+/* Fixed backdrop from tablet/desktop row layout up (pairs with columns flex row @ 900px). */
+@media (width >= 900px) and (prefers-reduced-motion: no-preference) {
+  main .section.warm-gray.columns-slide-section {
+    background-attachment: fixed;
+  }
+}
+
+@media (width >= 1024px) and (prefers-reduced-motion: no-preference) {
+  main .section.warm-gray.columns-slide-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.columns-gene-slide-snap {
+    scroll-snap-type: none;
+  }
+
+  main .section.warm-gray.columns-slide-section {
+    background-attachment: scroll;
+  }
+}
+
+main .section.warm-gray.columns-slide-section {
+  background-color: transparent;
+  background-image: var(--columns-slide-bg-image, none);
+  background-size: var(--columns-slide-bg-size, cover);
+  background-position: var(--columns-slide-bg-position, center center);
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-height: 100dvh;
+
+  /* Kill 1px hairline between `.hero-scroll-pin` and this section on some GPUs. */
+  margin: -1px 0 0;
+  padding: 0;
+}
+
+/*
+ * Panel must stay transparent so masked “holes” in the bar reveal the section’s hero backdrop.
+ * Warm gray lives on the copy column only (same color as the bar fill).
+ */
+main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
+  background-color: transparent;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:not(.columns-img-col) {
+  background-color: var(--color-warm-gray);
+  box-sizing: border-box;
+}
+
 @media (width >= 900px) {
   .columns > div {
     align-items: center;
     display: flex;
-    gap: 32px;
     margin: 0 auto;
-    max-width: 1050px;
     position: relative;
     width: 100%;
     flex-direction: column-reverse;
@@ -69,12 +192,28 @@
   }
 
   main > .section.columns-container .columns a.button {
-    padding: 10px 32px;
+    padding: 10px 48px;
     border-radius: 50px;
     text-decoration: none;
     background-color: var(--color-primary-dark);
     color: var(--color-white);
-    line-height: 1.8125;
+    letter-spacing: .03rem;
+    border-color: white;
+  }
+
+  /* Warm-gray section: white pill button (matches original gene.com "50 years" CTA) */
+  main > .section.warm-gray.columns-container .columns a.button {
+    background-color: var(--color-white);
+    color: var(--text-color);
+    margin:0;
+  }
+
+  main > .section.warm-gray.columns-container .columns a.button:hover {
+    background-color: var(--color-light-gray);
+  }
+
+  .section.warm-gray .columns .columns-img-col {
+    position: relative;
   }
 
   .columns > div > div {
@@ -83,11 +222,13 @@
   }
 
   .columns > div > div:not(.columns-img-col) {
-    padding: var(--spacing-xxl) var(--spacing-xl);
+   padding-left:50px;
+   padding-right: 20px;
+   padding-top:30px;
   }
 }
 
-@media (width >= 1023px) {
+@media (width >= 1024px) {
   /* @font-face uses family "gene-condensed"; Bold is weight 700, not a separate family name */
   main > .section.columns-container .columns h2 {
     font-family: gene-condensed, gene-condensed-fallback, sans-serif;
@@ -98,19 +239,93 @@
     margin-bottom: 27px;
   }
 
+  /* "50 years" heading: Gene-Serif 50px (matches gene.com) */
+  .columns h5 {
+    font-family: gene-serif-regular, serif;
+    font-size: 1.875rem;
+    font-weight: 400;
+    line-height: 130%;
+    margin: 0 0 32px;
+  }
+
   .columns > div > div:not(.columns-img-col) p {
     font-size: 17px;
     margin: 7px 25px 0 0;
   }
 
+  .columns:not(.columns-gene-slide) > div {
+    height: 406px;
+  }
+
   .columns > div {
-    gap: 64px;
     flex-direction: row;
-    padding: 34px 25px 55px;
-    max-width: 1030px;
+  }
+
+  .columns.columns-gene-slide > div {
+    height: auto;
+    min-height: 406px;
+    align-items: center;
   }
 
   .columns > div > .columns-img-col img {
     border-radius: 20px;
+  }
+
+  /* "50" column (non–flexible-cta): width/height rounding; gene slide uses StoryApp bar rules at 960px */
+  .section.warm-gray .columns:not(.columns-gene-slide) > div > .columns-img-col {
+    flex: 0 1 auto;
+    max-width: 600px;
+    min-width: auto;
+    width: round(up, 30%, 1px);
+    min-height: round(up, 100%, 1px);
+  }
+
+  /* Warm-gray columns: larger description text + proper spacing */
+  .section.warm-gray .columns > div > div:not(.columns-img-col) p {
+    font-size: 20px;
+    line-height: 1.56;
+    margin: 32px 0;
+    max-width: 850px;
+  }
+}
+
+@media (width >= 1400px) {
+  .columns.columns-gene-slide > div {
+    height: 432px;
+  }
+  
+.columns:not(.columns-gene-slide) > div {
+    height: 432px;
+  }
+
+  .columns h5 {
+    font-size: 3.125rem;
+  }
+
+  .columns > div > div:not(.columns-img-col) {
+    padding: 80px 60px;
+  }
+
+  .section.warm-gray .columns > div > div:not(.columns-img-col) p {
+    font-size: 20px;
+    line-height: 156%;
+  }
+}
+
+/*
+ * StoryApp .flexible-cta.image-left .content — overrides .columns > div column-reverse (900px+).
+ * max-width 960px → column; min-width 961px → row (StoryApp-URji_XlK.css).
+ */
+.columns.columns-gene-slide.columns-flexible-cta-image-left > div {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+@media (width > 960px) {
+  .columns.columns-gene-slide.columns-flexible-cta-image-left > div {
+    flex-direction: row;
   }
 }
