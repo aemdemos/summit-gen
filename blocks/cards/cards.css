@@ -1,5 +1,10 @@
 @import url('./cards-tokens.css');
 
+/* Sections that include the cards block: let the default content wrapper span full main width. */
+main .section:has(.cards) > div {
+  max-width: 100%;
+}
+
 /*
  * Block wrapper: same max width as main section column (styles.css).
  * Grid: capped width + margin-inline auto centers the row when viewport > --cards-grid-max-width.
@@ -7,7 +12,7 @@
 .cards {
   box-sizing: border-box;
   margin-inline: auto;
-  max-width: var(--max-width-site);
+  max-width: 100%;
   width: 100%;
 }
 
