@@ -56,7 +56,6 @@ footer .footer-nav ul {
   padding: 0;
   margin: 0;
   -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
     break-inside: avoid;
     display: inline-block;
 }
@@ -124,6 +123,7 @@ footer .footer-copyright {
 }
 
 /* ── Tablet: 768px+ ── */
+
 /* Logo left, nav in 3 CSS columns beside it */
 @media (width >= 768px) {
   footer .footer > div {
@@ -150,7 +150,6 @@ footer .footer-copyright {
   }
 
   footer .footer-nav ul {
-    margin-bottom: 16px;
     line-height: 1;
     margin: 0 0 1.5em;
   }
@@ -181,6 +180,7 @@ footer .footer-copyright {
 }
 
 /* ── Desktop: 1024px+ ── */
+
 /* Nav uses explicit 4-column grid for guaranteed distribution */
 @media (width >= 1024px) {
   footer .footer > div {
