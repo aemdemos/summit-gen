@@ -31,6 +31,45 @@
   margin: 0 0 var(--spacing-m);
 }
 
+
+main .section.warm-gray.columns-slide-section {
+  background-color: transparent;
+  background-image: var(--columns-slide-bg-image, none);
+  background-size: var(--columns-slide-bg-size, cover);
+  background-position: var(--columns-slide-bg-position, center center);
+  background-repeat: no-repeat;
+  background-origin: border-box;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-height: 200dvh;
+
+  /* Kill 1px hairline between `.hero-scroll-pin` and this section on some GPUs. */
+  margin: -1px 0 0;
+  padding: 0;
+}
+
+/*
+ * Panel must stay transparent so masked “holes” in the bar reveal the section’s hero backdrop.
+ * Warm gray lives on the copy column only (same color as the bar fill).
+ */
+main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
+  background-color: transparent;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  margin-top: 100dvh;
+}
+
+main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:not(.columns-img-col) {
+  background-color: var(--color-warm-gray);
+  box-sizing: border-box;
+}
+
 /* @font-face family is "gene-sans"; Regular is weight 400 */
 .columns > div > div:not(.columns-img-col) p {
   font-family: gene-sans, gene-sans-fallback, sans-serif;
@@ -140,42 +179,6 @@ main > .section.columns-container > div {
   }
 }
 
-main .section.warm-gray.columns-slide-section {
-  background-color: transparent;
-  background-image: var(--columns-slide-bg-image, none);
-  background-size: var(--columns-slide-bg-size, cover);
-  background-position: var(--columns-slide-bg-position, center center);
-  background-repeat: no-repeat;
-  background-origin: border-box;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: stretch;
-  min-height: 100dvh;
-
-  /* Kill 1px hairline between `.hero-scroll-pin` and this section on some GPUs. */
-  margin: -1px 0 0;
-  padding: 0;
-}
-
-/*
- * Panel must stay transparent so masked “holes” in the bar reveal the section’s hero backdrop.
- * Warm gray lives on the copy column only (same color as the bar fill).
- */
-main .section.warm-gray.columns-slide-section .columns-gene-slide-panel {
-  background-color: transparent;
-  box-sizing: border-box;
-  flex: 0 0 auto;
-  width: 100%;
-  max-width: none;
-  margin-inline: 0;
-}
-
-main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:not(.columns-img-col) {
-  background-color: var(--color-warm-gray);
-  box-sizing: border-box;
-}
 
 @media (width >= 900px) {
   .columns > div {
