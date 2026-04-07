@@ -352,7 +352,130 @@ function playEntrance(taglineWrap, durationMs) {
  * @param {SVGSVGElement|null} svgEl
  * @param {Element|null} heroBlock `.hero.gene-animation` (ntech shift + CSS tokens)
  */
+/** @returns {number} */
+function readFixedHeaderOffsetPx() {
+  const h = document.querySelector('header');
+  const fromEl = h ? h.offsetHeight : 0;
+  const rawVar = getComputedStyle(document.documentElement).getPropertyValue('--header-height').trim();
+  const fromVar = parseFloat(rawVar);
+  const cssPx = Number.isFinite(fromVar) ? fromVar : 0;
+  return Math.round(Math.max(fromEl, cssPx));
+}
+
+/**
+ * `.columns-slide-section` is min 100dvh with `justify-content: center` — section top is far above
+ * the visible warm-gray / columns row; snapping to `section` leaves a band of fixed hero backdrop.
+ * @param {HTMLElement} sectionEl
+ * @returns {HTMLElement}
+ */
+function resolveHeroSnapTargetEl(sectionEl) {
+  if (sectionEl.classList.contains('columns-slide-section')) {
+    const inner = sectionEl.querySelector('.columns-gene-slide-panel')
+      || sectionEl.querySelector('.columns.columns-gene-slide');
+    if (inner instanceof HTMLElement) return inner;
+  }
+  return sectionEl;
+}
+
+/**
+ * After the long hero pin, align the next `main` block under the fixed header.
+ *
+ * Tall pins (e.g. 700vh): `pinRect.bottom` stays well below the fold until raw≈1, so
+ * `pinRect.bottom <= innerHeight` was almost never true — the snap never ran. We instead
+ * detect the transient “peek” frame: next section intersects the viewport but its top is still
+ * below the header offset (band visible at bottom), while raw shows we are deep in the pin.
+ * Also snap when raw reaches the end (float-safe).
+ *
+ * @param {HTMLElement} scrollPin
+ * @param {{ value: boolean }} snappedRef
+ */
+/**
+ * Document scroll Y where the hero pin progress is exactly at the end (raw === 1).
+ * @param {HTMLElement} scrollPin
+ * @returns {number|null}
+ */
+function getHeroPinEndScrollY(scrollPin) {
+  const pinRect = scrollPin.getBoundingClientRect();
+  const scrollable = scrollPin.offsetHeight - window.innerHeight;
+  if (scrollable <= 0) return null;
+  const pinTopDoc = window.scrollY + pinRect.top;
+  return Math.max(0, pinTopDoc + scrollable);
+}
+
+/**
+ * After forward snap into the next section: scrolling back up jumps to hero end (raw = 1),
+ * not a slow scrub through the pin. Blocks immediate re-forward-snap until user scrolls down.
+ *
+ * @param {HTMLElement} scrollPin
+ * @param {{ value: boolean }} snappedRef
+ * @param {{ value: boolean }} blockForwardSnapRef
+ * @param {boolean} scrolledUp
+ */
+function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scrolledUp) {
+  if (!scrolledUp || !snappedRef.value) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const yEnd = getHeroPinEndScrollY(scrollPin);
+  if (yEnd === null) return;
+
+  const sy = window.scrollY;
+  /* Already at hero end or above (into the pin) — no jump */
+  if (sy <= yEnd + 12) return;
+
+  snappedRef.value = false;
+  blockForwardSnapRef.value = true;
+  window.scrollTo({ top: yEnd, left: 0, behavior: 'auto' });
+  const se = document.scrollingElement;
+  if (se && Math.abs(se.scrollTop - yEnd) > 1) {
+    se.scrollTop = yEnd;
+  }
+}
+
+function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef) {
+  if (blockForwardSnapRef.value) return;
+
+  const pinRect = scrollPin.getBoundingClientRect();
+  const scrollable = scrollPin.offsetHeight - window.innerHeight;
+  const raw = scrollable > 0 ? Math.max(0, Math.min(1, -pinRect.top / scrollable)) : 0;
+
+  if (raw < 0.04) {
+    snappedRef.value = false;
+    return;
+  }
+  if (snappedRef.value) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const next = scrollPin.nextElementSibling;
+  if (!(next instanceof HTMLElement)) return;
+
+  const target = resolveHeroSnapTargetEl(next);
+  const offset = readFixedHeaderOffsetPx();
+  const tr = target.getBoundingClientRect();
+  const vh = window.innerHeight;
+
+  const deepInPin = raw >= 0.78;
+  /* Same image as user screenshots: target block visible from below, not yet under header */
+  const nextPeeking = tr.top > offset + 2 && tr.top < vh * 0.92 && tr.bottom > offset + 10;
+  /* End of pin range (tolerant of float) */
+  const rawEnd = raw >= 0.991;
+
+  const shouldSnap = (deepInPin && nextPeeking) || rawEnd;
+  if (!shouldSnap) return;
+
+  snappedRef.value = true;
+  const y = Math.max(0, window.scrollY + tr.top - offset);
+  window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+  const se = document.scrollingElement;
+  if (se && Math.abs(se.scrollTop - y) > 1) {
+    se.scrollTop = y;
+  }
+}
+
 function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl, heroBlock) {
+  const heroPinSnapRef = { value: false };
+  const blockForwardHeroSnapRef = { value: false };
+  let lastScrollY = window.scrollY;
+
   let base = {
     baseSize: 0,
     baseLeft: 0,
@@ -417,20 +540,51 @@ function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntech
       wmScale: st.wmScale,
       wmTx: st.wmTx,
     });
+
+    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef);
   }
 
   let ticking = false;
+  let scrollSettleTimer = 0;
+
+  function trySnapAfterScrollSettled() {
+    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef);
+  }
+
   function onScroll() {
+    const sy = window.scrollY;
+    if (sy > lastScrollY + 8) {
+      blockForwardHeroSnapRef.value = false;
+    }
+
+    window.clearTimeout(scrollSettleTimer);
+    scrollSettleTimer = window.setTimeout(trySnapAfterScrollSettled, 160);
+
     if (!ticking) {
       ticking = true;
       requestAnimationFrame(() => {
+        const scrolledUp = window.scrollY < lastScrollY - 4;
+        snapBackToHeroPinEnd(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef, scrolledUp);
         update();
+        lastScrollY = window.scrollY;
         ticking = false;
       });
     }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  const nextSection = scrollPin.nextElementSibling;
+  if (nextSection instanceof HTMLElement) {
+    const io = new IntersectionObserver(
+      () => {
+        trySnapAfterScrollSettled();
+      },
+      { root: null, threshold: [0, 0.02, 0.08, 0.15] },
+    );
+    io.observe(nextSection);
+  }
+
   window.addEventListener('resize', () => {
     refreshBase();
     update();

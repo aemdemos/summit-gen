@@ -280,12 +280,19 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
     min-height: round(up, 100%, 1px);
   }
 
+  .section.warm-gray .columns > div > div:not(.columns-img-col) {
+padding-top: 70px;
+padding-left:70px;
+padding-right:0;
+  }
+
   /* Warm-gray columns: larger description text + proper spacing */
   .section.warm-gray .columns > div > div:not(.columns-img-col) p {
     font-size: 20px;
     line-height: 1.56;
     margin: 32px 0;
     max-width: 850px;
+
   }
 }
 
@@ -304,6 +311,10 @@ main .section.warm-gray.columns-slide-section .columns-gene-slide > div > div:no
 
   .columns > div > div:not(.columns-img-col) {
     padding: 80px 60px;
+  }
+
+  .section.warm-gray .columns > div > div:not(.columns-img-col) {
+    padding: 80px 96px;
   }
 
   .section.warm-gray .columns > div > div:not(.columns-img-col) p {
