@@ -20,6 +20,9 @@ function setSlideSectionBackdrop(section, src) {
   if (!src) return;
   const safe = src.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   section.style.setProperty('--columns-slide-bg-image', `url("${safe}")`);
+  /* Match `.hero .gene-mask` / `.g-mask` (hero.css) so the fixed layer lines up with the hero illustration. */
+  section.style.setProperty('--columns-slide-bg-size', 'cover');
+  section.style.setProperty('--columns-slide-bg-position', 'center center');
 }
 
 const firstSrcsetUrl = (srcset) => srcset.split(',')[0]?.trim()?.split(/\s+/)[0] || '';

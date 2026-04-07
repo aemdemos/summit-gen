@@ -106,8 +106,8 @@ main > .section.columns-container > div {
 /*
  * gene.com-style "50 years" slide: outer shell = previous (hero) illustration at 100dvh;
  * inner panel = warm-gray band with columns only.
- * Fixed backdrop + scroll snap (html.columns-gene-slide-snap from columns.js): less visible seam
- * from the pinned hero and a snap when this slide reaches the viewport.
+ * Same image + cover + center as `.hero .gene-mask`; `fixed` keeps it pinned to the viewport while
+ * this section scrolls, so the handoff from the sticky hero reads as one continuous backdrop.
  */
 @media (width >= 1024px) {
   html.columns-gene-slide-snap {
@@ -116,10 +116,15 @@ main > .section.columns-container > div {
   }
 }
 
+/* Fixed backdrop from tablet/desktop row layout up (pairs with columns flex row @ 900px). */
+@media (width >= 900px) and (prefers-reduced-motion: no-preference) {
+  main .section.warm-gray.columns-slide-section {
+    background-attachment: fixed;
+  }
+}
+
 @media (width >= 1024px) and (prefers-reduced-motion: no-preference) {
   main .section.warm-gray.columns-slide-section {
-    /* Same crop as hero cover layers; fixed = continuous with viewport while scrolling. */
-    background-attachment: fixed;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }
@@ -138,16 +143,19 @@ main > .section.columns-container > div {
 main .section.warm-gray.columns-slide-section {
   background-color: transparent;
   background-image: var(--columns-slide-bg-image, none);
-  background-size: cover;
-  background-position: center;
+  background-size: var(--columns-slide-bg-size, cover);
+  background-position: var(--columns-slide-bg-position, center center);
   background-repeat: no-repeat;
+  background-origin: border-box;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
   min-height: 100dvh;
-  margin: 0;
+
+  /* Kill 1px hairline between `.hero-scroll-pin` and this section on some GPUs. */
+  margin: -1px 0 0;
   padding: 0;
 }
 
