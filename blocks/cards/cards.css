@@ -89,11 +89,12 @@ main .section:has(.cards) > div {
 
 /* Card description (second p) */
 .cards .cards-card-body p:nth-of-type(2) {
-  font-size: 14.4px;
+  font-size: 14px;
   line-height: 1.35;
-  letter-spacing: 0.16px;
+  letter-spacing: 0.5px;
   color: var(--color-gray-dark);
   margin: 8px 0 0;
+  font-family:gene-sans, gene-sans-fallback, sans-serif;
 }
 
 
@@ -133,7 +134,7 @@ main .section:has(.cards) > div {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-height: 330px;
+    min-height: 345px;
     min-width: 240px;
   }
 
@@ -147,7 +148,7 @@ main .section:has(.cards) > div {
   /* Card body: flex-grow to push content, padding */
   .cards .cards-card-body {
     flex: 1;
-    padding: 16px 14px;
+    padding: 0 14px;
     margin: 0;
     font-size: 14.4px;
     line-height: 1.35;
@@ -155,6 +156,7 @@ main .section:has(.cards) > div {
     font-family: gene-sans, gene-sans-fallback, sans-serif;
     font-weight: 400;
     letter-spacing: 0.01rem;
+    margin-top: 20px;
   }
 
   /* Press Release — first card only (story cards use p:first-of-type below) */
@@ -202,10 +204,11 @@ main .section:has(.cards) > div {
 
   /* Story cards 2+: title */
   .cards > ul > li:not(:first-child) .cards-card-body p:first-of-type {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15.5px;
+    font-weight: 600;
     color: #30373d;
-    line-height: 1.3;
+    line-height: 1.2;
+    font-family: gene-sans-bold, sans-serif;
   }
 
   .cards > ul > li:not(:first-child):hover .cards-card-body p:first-of-type {
