@@ -81,6 +81,20 @@
   overflow: hidden;
 }
 
+/* Hidden img: same URL as mask-image so the browser can fetch with fetchpriority="high" (not available on CSS url()) */
+.hero .gene-animation-mask-container .hero-gene-mask-priority {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 /* Full-viewport illustration layers — mask-size / mask-position driven in JS (`T`, `z`) */
 .hero.gene-animation .gene-mask,
 .hero.gene-animation .g-mask {

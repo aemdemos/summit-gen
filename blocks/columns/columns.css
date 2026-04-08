@@ -175,7 +175,9 @@ main > .section.columns-container > div {
 @media (width >= 1024px) and (prefers-reduced-motion: no-preference) {
   main .section.warm-gray.columns-slide-section {
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+
+    /* `always` traps scroll on this 200dvh+ section and fights scrolling through to video below */
+    scroll-snap-stop: normal;
   }
 }
 

@@ -374,16 +374,69 @@ function isHeroGeneSnapTargetSection(sectionEl) {
 }
 
 /**
- * Rect for “past the gene handoff” checks: the columns row, not the whole section (video may live
- * in the same `.columns-slide-section`, so the section box stays tall while the user is on video).
+ * Rect for “past the gene handoff” checks: the **gene columns block** only.
+ * `.columns-gene-slide-panel` is often the section inner wrapper that also holds a `.video` sibling,
+ * so its box stays in the viewport while the user watches video — reverse snap must use `.columns` only.
  * @param {HTMLElement} sectionEl
  * @returns {DOMRect}
  */
 function getGeneHandoffExitRect(sectionEl) {
-  const panel = sectionEl.querySelector('.columns-gene-slide-panel')
-    || sectionEl.querySelector('.columns.columns-gene-slide');
+  const cols = sectionEl.querySelector('.columns.columns-gene-slide');
+  if (cols instanceof HTMLElement) return cols.getBoundingClientRect();
+  const panel = sectionEl.querySelector('.columns-gene-slide-panel');
   const el = panel instanceof HTMLElement ? panel : sectionEl;
   return el.getBoundingClientRect();
+}
+
+/**
+ * Video blocks at/after the gene handoff (same section or below) that overlap the viewport.
+ * Uses the `.video` block box (not `.video-bg`, which can be 0×0 before decode). Relaxed edges so
+ * scroll-up does not snap to hero while the user is still in “video territory”.
+ *
+ * @param {HTMLElement} scrollPin
+ * @returns {boolean}
+ */
+/** @param {HTMLElement} geneSection */
+function videoBlockIsInGeneSectionOrAfter(geneSection, block) {
+  if (geneSection.contains(block)) return true;
+  const pos = geneSection.compareDocumentPosition(block);
+  /* eslint-disable-next-line no-bitwise -- compareDocumentPosition bitmask */
+  return (pos & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+}
+
+function isHandoffRelatedVideoInViewport(scrollPin) {
+  const next = scrollPin.nextElementSibling;
+  if (!(next instanceof HTMLElement) || !isHeroGeneSnapTargetSection(next)) return false;
+
+  const main = document.querySelector('main');
+  if (!main) return false;
+
+  const vh = window.innerHeight;
+  const blocks = main.querySelectorAll('.video');
+  const cap = Math.min(blocks.length, 24);
+  for (let i = 0; i < cap; i += 1) {
+    const block = blocks[i];
+    if (!block.closest('.hero') && videoBlockIsInGeneSectionOrAfter(next, block)) {
+      const r = block.getBoundingClientRect();
+      if (r.bottom > 2 && r.top < vh - 2) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @param {HTMLElement} scrollPin
+ * @param {DOMRect} exitR
+ * @param {{ lastY: number|null }} forwardSnapAnchorRef
+ */
+function passesGeneForwardSnapGuards(scrollPin, exitR, forwardSnapAnchorRef) {
+  if (exitR.bottom <= 8) return false;
+  if (isHandoffRelatedVideoInViewport(scrollPin)) return false;
+  const syPre = window.scrollY;
+  if (forwardSnapAnchorRef.lastY !== null && syPre > forwardSnapAnchorRef.lastY + 96) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -431,6 +484,7 @@ function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scroll
   clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef);
   if (!scrolledUp || !snappedRef.value) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (isHandoffRelatedVideoInViewport(scrollPin)) return;
 
   const next = scrollPin.nextElementSibling;
   if (next instanceof HTMLElement && isHeroGeneSnapTargetSection(next)) {
@@ -457,7 +511,10 @@ function snapBackToHeroPinEnd(scrollPin, snappedRef, blockForwardSnapRef, scroll
   }
 }
 
-function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef) {
+/**
+ * @param {{ lastY: number|null }} forwardSnapAnchorRef last document scroll Y applied by hero→gene forward snap
+ */
+function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef, forwardSnapAnchorRef) {
   clearHeroSnapAfterPastGeneSection(scrollPin, snappedRef);
   if (blockForwardSnapRef.value) return;
 
@@ -467,6 +524,7 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
 
   if (raw < 0.04) {
     snappedRef.value = false;
+    forwardSnapAnchorRef.lastY = null;
     return;
   }
   if (snappedRef.value) return;
@@ -479,17 +537,17 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
   /* `raw` stays clamped at 1 below the pin; use columns row rect — not the whole section if video
    * is inside the same `.columns-slide-section`. */
   const exitR = getGeneHandoffExitRect(next);
-  if (exitR.bottom <= 8) return;
+  if (!passesGeneForwardSnapGuards(scrollPin, exitR, forwardSnapAnchorRef)) return;
 
   /* Gene slide: snap to section root so tall shells + panel `margin-top` keep the lead-in in view. */
   const target = next;
-  const offset = readFixedHeaderOffsetPx();
+  const headerH = readFixedHeaderOffsetPx();
   const tr = target.getBoundingClientRect();
   const vh = window.innerHeight;
 
   const deepInPin = raw >= 0.78;
   /* Same image as user screenshots: target block visible from below, not yet under header */
-  const nextPeeking = tr.top > offset + 2 && tr.top < vh * 0.92 && tr.bottom > offset + 10;
+  const nextPeeking = tr.top > headerH + 2 && tr.top < vh * 0.92 && tr.bottom > headerH + 10;
   /* End of pin range (tolerant of float) */
   const rawEnd = raw >= 0.991;
 
@@ -497,7 +555,9 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
   if (!shouldSnap) return;
 
   snappedRef.value = true;
-  const y = Math.max(0, window.scrollY + tr.top - offset);
+  /* Was `scrollY + tr.top - headerH` (section top under header); add one header-height more. */
+  const y = Math.max(0, Math.round(window.scrollY + tr.top));
+  forwardSnapAnchorRef.lastY = y;
   window.scrollTo({ top: y, left: 0, behavior: 'auto' });
   const se = document.scrollingElement;
   if (se && Math.abs(se.scrollTop - y) > 1) {
@@ -508,6 +568,7 @@ function snapNextSectionAfterHeroPin(scrollPin, snappedRef, blockForwardSnapRef)
 function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntechGroup, svgEl, heroBlock) {
   const heroPinSnapRef = { value: false };
   const blockForwardHeroSnapRef = { value: false };
+  const forwardSnapAnchorRef = { lastY: null };
   let lastScrollY = window.scrollY;
 
   let base = {
@@ -575,14 +636,14 @@ function initGeneScroll(scrollPin, geneMask, gMask, wordmark, taglineWrap, ntech
       wmTx: st.wmTx,
     });
 
-    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef);
+    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef, forwardSnapAnchorRef);
   }
 
   let ticking = false;
   let scrollSettleTimer = 0;
 
   function trySnapAfterScrollSettled() {
-    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef);
+    snapNextSectionAfterHeroPin(scrollPin, heroPinSnapRef, blockForwardHeroSnapRef, forwardSnapAnchorRef);
   }
 
   function onScroll() {
@@ -693,14 +754,27 @@ export default async function decorate(block) {
 
   block.textContent = '';
   block.classList.add('gene-animation');
+  /* columns-slide-section backdrop (`getHeroIllustrationUrl`) — not `.hero img` (preload + mask SVG) */
+  block.dataset.heroIllustrationSrc = imgSrc;
 
   const codeBasePath = window.hlx?.codeBasePath || '';
+  const geneMaskSvgUrl = `${codeBasePath}/icons/gene-mask.svg`;
 
   const timeline = document.createElement('div');
   timeline.className = 'gene-animation-timeline';
 
   const maskContainer = document.createElement('div');
   maskContainer.className = 'gene-animation-mask-container';
+
+  /* LCP / priority fetch: mask is loaded via CSS url(); this img matches that URL for cache + fetchpriority */
+  const geneMaskSvgPrime = document.createElement('img');
+  geneMaskSvgPrime.className = 'hero-gene-mask-priority';
+  geneMaskSvgPrime.src = geneMaskSvgUrl;
+  geneMaskSvgPrime.alt = '';
+  geneMaskSvgPrime.setAttribute('aria-hidden', 'true');
+  geneMaskSvgPrime.setAttribute('fetchpriority', 'high');
+  geneMaskSvgPrime.setAttribute('loading', 'eager');
+  maskContainer.append(geneMaskSvgPrime);
 
   const geneMask = document.createElement('div');
   geneMask.className = 'gene-mask';

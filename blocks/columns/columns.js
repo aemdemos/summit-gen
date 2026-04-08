@@ -5,8 +5,13 @@ import { getBlockId } from '../../scripts/scripts.js';
  * @returns {string}
  */
 function getHeroIllustrationUrl() {
-  const heroSource = document.querySelector('.hero picture source');
-  const heroImgEl = document.querySelector('.hero img');
+  const hero = document.querySelector('.hero');
+  if (hero?.dataset?.heroIllustrationSrc) {
+    return hero.dataset.heroIllustrationSrc;
+  }
+  if (!hero) return '';
+  const heroSource = hero.querySelector('picture source');
+  const heroImgEl = hero.querySelector('img:not(.hero-gene-mask-priority)');
   return heroSource?.srcset?.split(',')[0]?.trim()?.split(' ')[0]
     || heroImgEl?.currentSrc || heroImgEl?.src || '';
 }
