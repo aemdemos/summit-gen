@@ -55,7 +55,8 @@ main .section:has(.cards) > div {
   padding: 8px 0;
 }
 
-/* Category tag (h4) */
+/* Primary card title (h3 after block normalize; h4 kept for legacy authored markup) */
+.cards .cards-card-body h3,
 .cards .cards-card-body h4 {
   font-family: var(--display-font-family);
   font-size: var(--body-font-size-xxs);
@@ -66,11 +67,13 @@ main .section:has(.cards) > div {
   padding: 8px 0;
 }
 
+.cards .cards-card-body h3 a,
 .cards .cards-card-body h4 a {
   color: var(--color-cyan);
   text-decoration: none;
 }
 
+.cards .cards-card-body h3 a:hover,
 .cards .cards-card-body h4 a:hover {
   text-decoration: underline;
 }
@@ -160,6 +163,7 @@ main .section:has(.cards) > div {
   }
 
   /* Press Release — first card only (story cards use p:first-of-type below) */
+  .cards > ul > li:first-child .cards-card-body h3,
   .cards > ul > li:first-child .cards-card-body h4 {
     font-size: 22px;
     line-height: 1.17;
@@ -173,6 +177,7 @@ main .section:has(.cards) > div {
     transition: color 0.15s;
   }
 
+  .cards > ul > li:first-child .cards-card-body h3::after,
   .cards > ul > li:first-child .cards-card-body h4::after {
     content: '';
     display: block;

@@ -22,6 +22,16 @@
 }
 
 /* Genentech: CTA text styling within columns */
+.columns h2 {
+  font-family: var(--display-font-family);
+  font-size: var(--display-font-size-l);
+  font-weight: 400;
+  line-height: var(--line-height-display);
+  color: var(--color-black);
+  margin: 0 0 var(--spacing-m);
+}
+
+/* Genentech: CTA text styling within columns */
 .columns h5 {
   font-family: var(--display-font-family);
   font-size: var(--display-font-size-l);
@@ -165,7 +175,9 @@ main > .section.columns-container > div {
 @media (width >= 1024px) and (prefers-reduced-motion: no-preference) {
   main .section.warm-gray.columns-slide-section {
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+
+    /* `always` traps scroll on this 200dvh+ section and fights scrolling through to video below */
+    scroll-snap-stop: normal;
   }
 }
 
@@ -240,6 +252,14 @@ main > .section.columns-container > div {
     line-height: 2.6rem;
     margin-top: 0;
     margin-bottom: 27px;
+  }
+
+  main > .section.warm-gray.columns-container .columns h2 {
+    font-family: gene-serif-regular, serif;
+    font-size: 1.875rem;
+    font-weight: 400;
+    line-height: 130%;
+    margin: 0 0 32px;
   }
 
   main > .section.cards-container .columns a.button {
@@ -355,6 +375,10 @@ padding-right:0;
 main .section.cards-container .columns > div > div:not(.columns-img-col),
 main .section:has(.cards) .columns > div > div:not(.columns-img-col) {
   padding: 0;
+}
+
+main > .section.warm-gray.columns-container .columns h2 {
+  font-size: 3.125rem;
 }
 
 /*
