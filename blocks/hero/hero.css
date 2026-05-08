@@ -1,318 +1,138 @@
-@import url('./hero-tokens.css');
-
-/* === Scroll-pin wrapper === */
-
-/*
- * Outer wrapper injected by hero.js. Its height provides the scroll distance
- * during which the hero is pinned and the illustration-slide animation plays.
- */
-.hero-scroll-pin {
-  position: relative;
-  height: var(--hero-scroll-height, 300vh);
+/* Hero Block — Manulife Wealth style */
+.hero-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
 }
 
-/*
- * When hero.js adds .hero-pinned, the section sticks to the top of the
- * viewport for the full scroll distance provided by .hero-scroll-pin.
- */
-.hero-container.hero-pinned {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-}
-
-/* === Hero container & wrapper overrides === */
-.hero-container {
+main > .section:has(.hero) {
   margin: 0;
 }
 
-.hero-container > div {
-  max-width: unset;
-  padding: 0;
-}
-
-/* === Default hero === */
 .hero {
+  --hero-height: 848px;
+  --hero-content-padding: 48px 64px;
+  --hero-title-size: 48px;
+  --hero-subtitle-size: 16px;
+  --hero-text-color: #fff;
+  --hero-cta-bg: #06854d;
+  --hero-cta-color: #fff;
+  --hero-cta-padding: 14px 24px;
+
   position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: var(--hero-min-height);
-  min-height: 100dvh;
+  min-height: var(--hero-height);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  background-color: var(--color-warm-gray);
   overflow: hidden;
-  padding: 37vh 24px 0;
+  background: #282828;
 }
 
-/*
- * gene.com gene-animation (StoryApp-URji_XlK.css), scoped under .hero.
- * DOM + mask math: StoryApp M0 (HomepageTakeover only composes the page).
- */
-.hero.gene-animation {
-  padding: 0;
-  display: block;
-
-  /*
-   * `auto` = place `#ntech` from `#Gene` bbox (hero.js). Kern is SVG units: higher = more space between Gene and ntech.
-   * Override with a number for `--hero-ntech-shift-u` to set a fixed translate instead of auto.
-   */
-  --hero-ntech-shift-u: auto;
-  --hero-ntech-kern-u: 28;
-}
-
-.hero .gene-animation-timeline {
+.hero > div {
   position: relative;
-  z-index: 1;
-  height: 100%;
-  min-height: 100dvh;
   width: 100%;
+  min-height: var(--hero-height);
+  display: flex;
+  align-items: center;
 }
 
-.hero .gene-animation-mask-container {
-  position: relative;
-  height: 100%;
-  min-height: 100dvh;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Hidden img: same URL as mask-image so the browser can fetch with fetchpriority="high" (not available on CSS url()) */
-.hero .gene-animation-mask-container .hero-gene-mask-priority {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* Full-viewport illustration layers — mask-size / mask-position driven in JS (`T`, `z`) */
-.hero.gene-animation .gene-mask,
-.hero.gene-animation .g-mask {
+.hero > div > div:first-child {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1;
-  height: 100lvh;
   width: 100%;
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transform: translateZ(0);
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  pointer-events: none;
-}
-
-.hero.gene-animation .gene-mask {
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-image: url('/icons/gene-mask.svg');
-  mask-image: url('/icons/gene-mask.svg');
-}
-
-.hero.gene-animation .g-mask {
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-mask-image: url('/icons/g-mask.svg');
-  mask-image: url('/icons/g-mask.svg');
-  opacity: 0;
-}
-
-.hero .gene-animation-flex-center {
-  position: relative;
-  z-index: 2;
   height: 100%;
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
 }
 
-.hero .wordmark-wrapper {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: flex-end;
+.hero > div > div:first-child p {
+  margin: 0;
+  height: 100%;
+}
+
+.hero > div > div:first-child picture,
+.hero > div > div:first-child img {
   width: 100%;
-  box-sizing: border-box;
-}
-
-.hero .mask-background {
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
-  z-index: 0;
-}
-
-.hero .wordmark-container {
-  display: flex;
-  flex-flow: column nowrap;
-  position: relative;
-  z-index: 1;
-  flex: 0 1 73.8%;
-  max-width: 73.8%;
-  width: 100%;
-  transform: translateZ(0);
-}
-
-/* Tagline on its own row under mask column + wordmark column */
-.hero.gene-animation .tagline-wrapper {
-  flex-basis: 100%;
-}
-
-.hero .wordmark {
-  display: flex;
-  flex-flow: row nowrap;
-  flex-shrink: 0;
-  width: 100%;
-  transform: translateZ(0);
-  transform-origin: left center;
-}
-
-.hero .wordmark svg {
-  width: 100%;
-  height: auto;
+  height: 100%;
+  max-width: 100%;
+  object-fit: cover;
+  object-position: top right;
   display: block;
 }
 
-.hero .tagline-wrapper {
-  width: 100%;
-}
-
-.hero .tagline-container {
-  flex-shrink: 1;
-  position: relative;
-  width: 100%;
-}
-
-/* Tagline — entrance fade in hero.js */
-.hero .gene-animation-tagline {
-  font-family: gene-serif, gene-serif-fallback, Georgia, serif;
-  font-size: clamp(20px, 5vw, 46px);
-  font-weight: 400;
-  color: var(--color-black);
-  text-align: center;
-  margin: 0;
-  line-height: 1.35;
-}
-
-.hero .hero-fallback-wordmark {
-  font-family: gene-condensed, 'Arial Black', sans-serif;
-  font-size: clamp(2rem, 8vw, 4rem);
-  font-weight: 700;
-  color: var(--color-black);
-  margin: 0;
-}
-
-/* === Video variant === */
-.hero.video {
-  background-color: var(--color-black);
-  min-height: var(--hero-min-height);
-  padding: 0;
-  justify-content: center;
-}
-
-.hero.video .hero-video {
+/* Dark gradient overlay from left */
+.hero > div::before {
+  content: '';
   position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-.hero.video video {
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-}
-
-.hero.video .hero-text {
-  position: relative;
+  background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0) 70%);
   z-index: 1;
+}
+
+/* Content cell */
+.hero > div > div:last-child {
+  position: relative;
+  z-index: 2;
+  padding: var(--hero-content-padding);
+  max-width: 600px;
+}
+
+.hero h1 {
+  color: var(--hero-text-color);
+  font-size: var(--hero-title-size);
+  font-weight: 300;
+  font-family: sans-serif;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.hero h1 em {
+  font-style: italic;
+}
+
+.hero p {
+  color: var(--hero-text-color);
+  font-size: var(--hero-subtitle-size);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+/* CTA button override */
+main .hero .button-wrapper {
+  display: block;
+  margin: 0;
+}
+
+main .hero a.button:any-link {
+  background: var(--hero-cta-bg);
+  color: var(--hero-cta-color);
+  padding: var(--hero-cta-padding);
+  border-radius: 0;
+  font-size: var(--hero-subtitle-size);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
   text-align: center;
-  max-width: 850px;
-  margin: 0 auto;
+  border: none;
+  white-space: nowrap;
 }
 
-.hero.video h1,
-.hero.video h2,
-.hero.video h3,
-.hero.video h4,
-.hero.video h5 {
-  font-family: var(--display-font-family);
-  font-size: var(--display-font-size-l);
-  font-weight: 400;
-  line-height: var(--line-height-display);
-  color: var(--color-white);
-  text-align: center;
-  margin: 0 0 20px;
-  -webkit-text-fill-color: unset; /* stylelint-disable-line property-no-vendor-prefix */
-  background-clip: unset;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-background-clip: unset;
-  background-image: none;
+main .hero a.button:any-link:hover {
+  background: #05703f;
 }
 
-.hero.video p {
-  font-family: var(--body-font-family);
-  font-size: var(--body-font-size-l);
-  font-weight: 400;
-  line-height: 1.56;
-  color: var(--color-white);
-  text-align: center;
-  margin: 20px 0;
-}
-
-.hero.video .button-wrapper {
-  text-align: center;
-}
-
-.hero.video a.button {
-  background-color: var(--color-white);
-  color: var(--text-color);
-  letter-spacing: 0.48px;
-}
-
-.hero.video a.button:hover {
-  background-color: var(--color-light-gray);
-}
-
-/* === Responsive === */
-@media (width >= 768px) {
-  .hero:not(.gene-animation) {
-    padding: 37vh 40px 0;
-  }
-}
-
-@media (width >= 1024px) {
-  .hero:not(.gene-animation) {
-    min-height: var(--hero-min-height-desktop);
-    padding: 26vh 0 0;
-  }
-}
-
-/* Center Gene + ntech as a unit; mask math uses real wordmark offset (hero.js) */
-@media (width >= 1000px) {
-  .hero.gene-animation .gene-animation-flex-center {
-    justify-content: center;
+/* Responsive */
+@media (width < 900px) {
+  .hero {
+    --hero-height: auto;
+    min-height: 500px;
   }
 
-  .hero.gene-animation .wordmark-wrapper {
-    justify-content: center;
+  .hero h1 {
+    font-size: 36px;
   }
 
-  .hero.gene-animation .mask-background {
-    display: none;
-  }
-
-  .hero.gene-animation .wordmark-container {
-    flex: 0 1 73.8%;
-    max-width: 73.8%;
+  .hero > div > div:last-child {
+    padding: 32px 24px;
   }
 }

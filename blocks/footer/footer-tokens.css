@@ -1,7 +1,11 @@
-/* footer design tokens */
+/* footer design tokens — Manulife Wealth */
 :root {
-  --footer-max-width: var(--max-width-site);
-  --footer-padding: 40px 32px 28px;
-  --footer-padding-desktop: 40px 34px 27px;
-  --footer-bg: var(--color-warm-gray);
+  --footer-bg: #282b3e;
+  --footer-text: #fff;
+  --footer-divider: #424559;
+  --footer-link: #fff;
+  --footer-link-hover: #ccc;
+  --footer-padding: 32px;
+  --footer-max-width: 1440px;
+  --footer-font-size: 14px;
 }

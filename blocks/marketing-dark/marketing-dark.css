@@ -1,0 +1,90 @@
+.marketing-dark-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+.marketing-dark {
+  --block-bg: #046138;
+  --block-text: #fff;
+  --block-padding-top: 128px;
+  --block-padding-bottom: 192px;
+  --block-padding-inline: 64px;
+
+  background: var(--block-bg);
+  color: var(--block-text);
+  display: flex;
+  flex-direction: column;
+  min-height: 460px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (width >= 900px) {
+  .marketing-dark {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Content column (first row) */
+.marketing-dark > div:first-child {
+  padding: var(--block-padding-top) var(--block-padding-inline) var(--block-padding-bottom);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  max-width: 900px;
+}
+
+/* Icon cell */
+.marketing-dark > div:first-child > div:first-child {
+  margin-bottom: 12px;
+}
+
+.marketing-dark > div:first-child > div:first-child img {
+  width: 48px;
+  height: 48px;
+}
+
+/* Text cell */
+.marketing-dark > div:first-child > div:last-child h2 {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.25;
+  color: var(--block-text);
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.marketing-dark > div:first-child > div:last-child p {
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--block-text);
+  margin-top: 0;
+}
+
+/* Image column (second row) */
+.marketing-dark > div:last-child {
+  display: none;
+}
+
+@media (width >= 900px) {
+  .marketing-dark > div:last-child {
+    display: block;
+    flex: 0 0 500px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .marketing-dark > div:last-child > div {
+    position: absolute;
+    inset: 0;
+  }
+
+  .marketing-dark > div:last-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+}

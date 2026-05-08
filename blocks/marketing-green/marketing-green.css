@@ -1,0 +1,110 @@
+.marketing-green {
+  --block-bg: #046138;
+  --block-text: #ffffff;
+  --block-padding-top: 128px;
+  --block-padding-bottom: 192px;
+  --block-padding-inline: 64px;
+  --block-title-size: 48px;
+  --block-desc-size: 16px;
+  --block-icon-size: 48px;
+
+  background: var(--block-bg);
+  color: var(--block-text);
+  overflow: hidden;
+}
+
+.marketing-green-wrapper {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+.marketing-green > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.marketing-green > div > div:first-child {
+  order: 1;
+  padding: 32px var(--block-padding-inline) 0;
+}
+
+.marketing-green > div > div:first-child img {
+  width: var(--block-icon-size);
+  height: var(--block-icon-size);
+}
+
+.marketing-green > div > div:nth-child(2) {
+  order: 2;
+  padding: 0 var(--block-padding-inline) 40px;
+}
+
+.marketing-green > div > div:nth-child(2) h2 {
+  color: var(--block-text);
+  font-size: var(--block-title-size);
+  font-weight: 300;
+  margin-top: 0.5em;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.marketing-green > div > div:nth-child(2) p {
+  color: var(--block-text);
+  font-size: var(--block-desc-size);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.marketing-green > div > div:last-child {
+  order: 3;
+  width: 100%;
+}
+
+.marketing-green > div > div:last-child img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+@media (width >= 900px) {
+  .marketing-green > div {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    min-height: 503px;
+  }
+
+  .marketing-green > div > div:first-child {
+    order: 1;
+    position: absolute;
+    padding: 80px 0 0 var(--block-padding-inline);
+  }
+
+  .marketing-green > div > div:nth-child(2) {
+    order: 2;
+    flex: 0 1 66.667%;
+    padding: 148px var(--block-padding-inline) var(--block-padding-bottom);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .marketing-green > div > div:last-child {
+    order: 3;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 33.333%;
+  }
+
+  .marketing-green > div > div:last-child img {
+    height: 100%;
+    width: auto;
+    min-width: 400px;
+    object-fit: cover;
+  }
+
+  .marketing-green > div {
+    position: relative;
+  }
+}

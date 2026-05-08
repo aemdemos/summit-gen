@@ -1,4 +1,4 @@
-/* header design tokens — gene.com floating-button style */
+/* header design tokens — Manulife Wealth */
 :root {
   /* mobile (default) */
   --header-height: 80px;
@@ -7,10 +7,10 @@
   --header-btn-padding: 10px;
   --header-btn-radius: 6px;
   --header-btn-bg: rgb(255 255 255);
-  --header-btn-shadow: 0 0 8px 0 rgb(181 181 181 / 50%);
-  --header-hamburger-bar-width: 18px;
+  --header-btn-shadow: none;
+  --header-hamburger-bar-width: 22px;
   --header-hamburger-bar-height: 2px;
-  --header-hamburger-bar-gap: 5px;
-  --header-nav-max-width: none;
-  --header-brand-width: 128px;
+  --header-hamburger-bar-gap: 6px;
+  --header-nav-max-width: 1400px;
+  --header-brand-width: 200px;
 }
